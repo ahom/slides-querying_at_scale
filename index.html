@@ -166,25 +166,25 @@
                     <h2>Sum</h2>
                     <pre><code data-trim>
 SELECT
-    SUM(price)
+    SUM(amount)
 FROM
-    CARS
-GROUP BY color;
+    SALES
+GROUP BY agency;
                     </code></pre>
                     <table class="stretch">
                         <tr>
                             <td>Map</td>
                             <td><pre><code data-trim>
-function(car) {
-    emit(car.color, car.price);
+function(sale) {
+    emit(sale.agency, sale.amount);
 }
                             </code></pre></td>
                         </tr>
                         <tr>
                             <td>Reduce</td>
                             <td><pre><code data-trim>
-function(color, prices) {
-    return Array.sum(prices);
+function(agency, amounts) {
+    return Array.sum(amounts);
 }
                             </code></pre></td>
                         </tr>
@@ -195,17 +195,17 @@ function(color, prices) {
                     <h2>Average Map</h2>
                     <pre><code data-trim>
 SELECT
-    AVG(price)
+    AVG(amount)
 FROM
-    CARS
+    SALES
 GROUP BY
-    color;
+    month;
                     </code></pre>
                     <pre><code data-trim contenteditable>
-function(car) {
-    emit(car.color, {
+function(sale) {
+    emit(sale.month, {
         count: 1,
-        sum: car.price
+        sum: sale.amount
     });
 }
                     </code></pre>
@@ -214,7 +214,7 @@ function(car) {
                 <section>
                     <h2>Average Reduce</h2>
                     <pre><code data-trim contenteditable>
-function(color, values) {
+function(month, values) {
     var reduced_value = {
         count: 0,
         sum: 0
@@ -231,7 +231,7 @@ function(color, values) {
                 <section>
                     <h2>Average Finalize</h2>
                     <pre><code data-trim contenteditable>
-function (color, value) {
+function (month, value) {
     return value.sum/value.count;
 }
                     </code></pre>

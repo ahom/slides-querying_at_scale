@@ -33,15 +33,22 @@
         <script src="lib/js/html5shiv.js"></script>
         <![endif]-->
 
+        <!-- http://ethanschoonover.com/solarized -->
         <style type="text/css">
-            #user {
-                fill: #000;
-            }
+        :root {
+            --yellow-color: #b58900;
+            --orange-color: #cb4b16;
+            --red-color: #dc322f;
+            --magenta-color: #d33682;
+            --violet-color: #6c71c4;
+            --blue-color: #268bd2;
+            --cyan-color: #2aa198;
+            --green-color: #859900;
+        }
         </style>
     </head>
 
     <body>
-
         <div class="reveal">
 
             <!-- Any section element inside of this container is displayed as a slide -->
@@ -58,31 +65,21 @@
                     <h2>What do you mean by Scale?</h2>
                     <div class="fragment">
                         Querying a database in a cluster (Most NoSQL databases)<br><br>
-                        <svg width="600" height="150">
-                            <defs>
-                                <marker id="arrowhead"
-                                        viewBox="0 0 10 10" 
-                                        refX="1" refY="5"
-                                        markerWidth="6" 
-                                        markerHeight="6"
-                                        orient="auto">
-                                    <path fill="#FFF" stroke="#FFF" d="M 0 0 L 10 5 L 0 10 z" />
-                                </marker>    
-                            </defs>   
-                            <image x="0" y="25" width="100" height="100" xlink:href="svg/user.svg" />
+                        <svg height="150" viewBox="0 0 600 150">
+                            <use x="0" y="25" width="100" height="100" fill="var(--green-color)" xlink:href="#svg_user" />
                             <path stroke="#FFF" d="M 125 75 L 275 75" marker-end="url(#arrowhead)"/>
-                            <image x="300" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
-                            <image x="500" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
-                            <image x="400" y="50" width="100" height="100" xlink:href="svg/database_blue.svg" />
+                            <use x="300" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="500" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="400" y="50" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
                         </svg>
                     </div>
                     <div class="fragment fade-in">
                         <hr>
                         Vs a single node (Traditional RDBMS)<br><br>
-                        <svg width="600" height="100">
-                            <image x="0" y="0" width="100" height="100" xlink:href="svg/user.svg" />
+                        <svg height="100" viewBox="0 0 600 100">
+                            <use x="0" y="0" width="100" height="100" fill="var(--green-color)" xlink:href="#svg_user" />
                             <path stroke="#FFF" d="M 125 50 L 375 50" marker-end="url(#arrowhead)"/>
-                            <image x="400" y="0" width="100" height="100" xlink:href="svg/database_white.svg" />
+                            <use x="400" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
                         </svg>
                     </div>
                 </section>
@@ -96,21 +93,24 @@
                 </section>
 
                 <section>
-                    <h2>How to make queries, ran against a cluster, scale?</h2>
+                    <h2>How to make queries scale?</h2>
                     <div class="fragment fade-in">
                         Run the query on each node<br><br>
-                        <svg width="400" height="100">
-                            <image x="0" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
-                            <image x="150" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
-                            <image x="300" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
+                        <svg height="100" viewBox="0 0 400 100">
+                            <use x="0" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="70" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                            <use x="150" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="220" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                            <use x="300" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="370" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
                         </svg>
                     </div>
                     <div class="fragment">
-                        <svg width="400" height="200">
-                            <path stroke="#FFF" d="M 50 0 L 200 75" marker-end="url(#arrowhead)"/>
+                        <svg height="200" viewBox="0 0 400 200">
+                            <path stroke="#FFF" d="M 50 0 L 190 75" marker-end="url(#arrowhead)"/>
                             <path stroke="#FFF" d="M 200 0 L 200 75" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 350 0 L 200 75" marker-end="url(#arrowhead)"/>
-                            <image x="150" y="100" width="100" height="100" xlink:href="svg/database_yellow.svg" />
+                            <path stroke="#FFF" d="M 350 0 L 210 75" marker-end="url(#arrowhead)"/>
+                            <use x="150" y="100" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
                         </svg>
                         <br>???
                         <br>Concatenate the results at the end
@@ -128,43 +128,113 @@
                 <section>
                     <h2>So how do we do that? MapReduce</h2>
                     <div class="fragment fade-in">
-                        <svg width="600" height="100">
-                            <text x="0" y="50" fill="white">Map</text>
-                            <image x="200" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
-                            <image x="350" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
-                            <image x="500" y="0" width="100" height="100" xlink:href="svg/database_blue.svg" />
+                        <svg height="100" viewBox="0 0 600 100">
+                            <text x="0" y="50" fill="var(--cyan-color)">Map</text>
+                            <use x="200" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="270" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                            <use x="350" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="420" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                            <use x="500" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="570" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
                         </svg>
                     </div>
                     <div class="fragment">
-                        <svg width="600" height="150">
-                            <text x="0" y="150" fill="white">Reduce</text>
-                            <line stroke="#FFF" x1="0" x2="600" y1="0" y2="0"/>
-                            <path stroke="#FFF" d="M 250 0 L 325 45" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 400 0 L 325 45" marker-end="url(#arrowhead)"/>
+                        <svg height="150" viewBox="0 0 600 150">
+                            <text x="0" y="150" fill="var(--violet-color)">Reduce</text>
+                            <path stroke="#FFF" d="M 250 0 L 320 45" marker-end="url(#arrowhead)"/>
+                            <path stroke="#FFF" d="M 400 0 L 330 45" marker-end="url(#arrowhead)"/>
                             <path stroke="#FFF" d="M 550 0 L 550 45" marker-end="url(#arrowhead)"/>
-                            <image x="275" y="50" width="100" height="100" xlink:href="svg/database_yellow.svg" />
-                            <image x="500" y="50" width="100" height="100" xlink:href="svg/database_yellow.svg" />
+                            <use x="275" y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
+                            <use x="500" y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
                         </svg>
-                        <svg width="600" height="150">
-                            <path stroke="#FFF" d="M 325 0 L 450 45" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 550 0 L 450 45" marker-end="url(#arrowhead)"/>
-                            <image x="400" y="50" width="100" height="100" xlink:href="svg/database_yellow.svg" />
+                        <svg height="150" viewBox="0 0 600 150">
+                            <path stroke="#FFF" d="M 325 0 L 445 45" marker-end="url(#arrowhead)"/>
+                            <path stroke="#FFF" d="M 550 0 L 455 45" marker-end="url(#arrowhead)"/>
+                            <use x="400" y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
                         </svg>
                     </div>
                     <div class="fragment">
-                        <svg width="600" height="150">
-                            <text x="0" y="75" fill="white">Finalize</text>
-                            <line stroke="#FFF" x1="0" x2="600" y1="0" y2="0"/>
+                        <svg height="150" viewBox="0 0 600 150">
+                            <text x="0" y="75" fill="var(--red-color)">Finalize</text>
                             <path stroke="#FFF" d="M 450 0 L 450 45" marker-end="url(#arrowhead)"/>
-                            <image x="400" y="50" width="100" height="100" xlink:href="svg/database_red.svg" />
+                            <use x="400" y="50" width="100" height="100" fill="var(--red-color)" xlink:href="#svg_process" />
                         </svg>
                     </div>
                 </section>
 
                 <section>
-                    <h2>Examples (TODO...)</h2>
-                    <p>A simple sum</p>
-                    <p>An average</p>
+                    <h2>Sum</h2>
+                    <pre><code data-trim>
+SELECT
+    SUM(price)
+FROM
+    CARS
+GROUP BY color;
+                    </code></pre>
+                    <table class="stretch">
+                        <tr>
+                            <td>Map</td>
+                            <td><pre><code data-trim>
+function(car) {
+    emit(car.color, car.price);
+}
+                            </code></pre></td>
+                        </tr>
+                        <tr>
+                            <td>Reduce</td>
+                            <td><pre><code data-trim>
+function(color, prices) {
+    return Array.sum(prices);
+}
+                            </code></pre></td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>Average Map</h2>
+                    <pre><code data-trim>
+SELECT
+    AVG(price)
+FROM
+    CARS
+GROUP BY
+    color;
+                    </code></pre>
+                    <pre><code data-trim contenteditable>
+function(car) {
+    emit(car.color, {
+        count: 1,
+        sum: car.price
+    });
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Average Reduce</h2>
+                    <pre><code data-trim contenteditable>
+function(color, values) {
+    var reduced_value = {
+        count: 0,
+        sum: 0
+    };
+    values.forEach(function (value) {
+        reduced_value.count += value.count;
+        reduced_value.sum += value.sum;
+    });
+    return reduced_value;
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Average Finalize</h2>
+                    <pre><code data-trim contenteditable>
+function (color, value) {
+    return value.sum/value.count;
+}
+                    </code></pre>
                 </section>
 
                 <section>
@@ -568,5 +638,41 @@ Reveal.addEventListener( 'customevent', function() {
 
         </script>
 
+        <svg width="0" height="0">
+            <defs>
+                <symbol id="svg_user" viewBox="0 0 654.348 654.348">
+                    <path fill="inherit" d="M466.121,401.586c52.287-41.184,85.985-104.92,85.985-176.654C552.106,100.708,451.398,0,327.174,0
+                        S102.242,100.708,102.242,224.932c0,71.733,33.699,135.47,85.985,176.654C94.471,449.373,28.484,543.764,21.184,654.348h40.958
+                        c7.893-103.549,75.209-190.332,167.861-226.793c29.446,14.15,62.327,22.311,97.171,22.311c34.865,0,67.725-8.16,97.17-22.311
+                        c92.652,36.461,159.968,123.244,167.861,226.793h40.958C625.884,543.764,559.876,449.373,466.121,401.586z M327.174,408.969
+                        c-101.649,0-184.036-82.387-184.036-184.037c0-101.649,82.387-184.035,184.036-184.035s184.036,82.386,184.036,184.035
+                        C511.209,326.582,428.823,408.969,327.174,408.969z"/>
+                </symbol>
+                <symbol id="svg_database" viewBox="0 0 32 32">
+                    <path fill="inherit" d="M16,0C9.256,0,2,2.033,2,6.5v19C2,29.965,9.256,32,16,32c6.743,0,14-2.035,14-6.5v-19
+                        C30,2.033,22.742,0,16,0z M28,25.5c0,2.484-5.373,4.5-12,4.5c-6.628,0-12-2.016-12-4.5v-3.736C6.066,23.893,11.05,25,16,25
+                        s9.934-1.107,12-3.236V25.5z M28,19.5h-0.004c0,0.01,0.004,0.021,0.004,0.031C28,22,22.627,24,16,24S4,22,4,19.531
+                        c0-0.01,0.004-0.021,0.004-0.031H4v-3.736C6.066,17.893,11.05,19,16,19s9.934-1.107,12-3.236V19.5z M28,13.5h-0.004
+                        c0,0.01,0.004,0.021,0.004,0.031C28,16,22.627,18,16,18S4,16,4,13.531c0-0.01,0.004-0.021,0.004-0.031H4v-3.436
+                        C6.621,12.061,11.425,13,16,13s9.379-0.939,12-2.936V13.5z M16,11C9.372,11,4,8.984,4,6.5C4,4.014,9.372,2,16,2
+                        c6.627,0,12,2.014,12,4.5C28,8.984,22.627,11,16,11z"/>
+                    <circle fill="inherit" cx="25" cy="26" r="1"/>
+                    <circle fill="inherit" cx="25" cy="20" r="1"/>
+                    <circle fill="inherit" cx="25" cy="14" r="1"/>
+                </symbol>
+                <symbol id="svg_process" viewBox="0 0 32 32">
+                    <path fill="inherit" d="M19.945,22l6.008-8L32,22h-4v2c0,3.309-2.691,6-6,6H10c-3.309,0-6-2.691-6-6v-2h4v2c0,1.102,0.898,2,2,2h12c1.102,0,2-0.898,2-2v-2H19.945z"/>
+                    <path fill="inherit" d="M12.055,10l-6.008,8L0,10h4V8c0-3.309,2.691-6,6-6h12c3.309,0,6,2.691,6,6v2h-4V8c0-1.102-0.898-2-2-2H10C8.898,6,8,6.898,8,8v2H12.055z"/>
+                </symbol>
+                <marker id="arrowhead"
+                        viewBox="0 0 10 10"
+                        refX="1" refY="5"
+                        markerWidth="6"
+                        markerHeight="6"
+                        orient="auto">
+                    <path fill="#FFF" stroke="#FFF" d="M 0 0 L 10 5 L 0 10 z" />
+                </marker>
+            </defs>
+        </svg>
     </body>
 </html>

@@ -45,6 +45,14 @@
             --cyan-color: #2aa198;
             --green-color: #859900;
         }
+
+        svg {
+            width:100%;
+            height:100%;
+            top:0;
+            left:0;
+            z-index:-1;
+        }
         </style>
     </head>
 
@@ -65,21 +73,15 @@
                     <h2>What do you mean by Scale?</h2>
                     <div class="fragment">
                         Querying a database in a cluster (Most NoSQL databases)<br><br>
-                        <svg height="150" viewBox="0 0 600 150">
-                            <use x="0" y="25" width="100" height="100" fill="var(--green-color)" xlink:href="#svg_user" />
-                            <path stroke="#FFF" d="M 125 75 L 275 75" marker-end="url(#arrowhead)"/>
-                            <use x="300" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="500" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="400" y="50" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                        <svg height="150">
+                            <use xlink:href="#svg_query_cluster" />
                         </svg>
                     </div>
-                    <div class="fragment fade-in">
+                    <div class="fragment">
                         <hr>
                         Vs a single node (Traditional RDBMS)<br><br>
-                        <svg height="100" viewBox="0 0 600 100">
-                            <use x="0" y="0" width="100" height="100" fill="var(--green-color)" xlink:href="#svg_user" />
-                            <path stroke="#FFF" d="M 125 50 L 375 50" marker-end="url(#arrowhead)"/>
-                            <use x="400" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                        <svg height="100">
+                            <use xlink:href="#svg_query_node" />
                         </svg>
                     </div>
                 </section>
@@ -87,30 +89,28 @@
                 <section>
                     <h2>Why should I care about how it works?</h2>
                     <ul>
-                        <li class="fragment">As a <strong>user</strong>, you should <strong>not</strong>, unless you are curious.</li>
-                        <li class="fragment">As a <strong>developer</strong>, you should, do I really need to explain why?</li>
+                        <li class="fragment">
+                            As a <strong>user</strong>, you should <strong>not</strong>, unless:
+                            <ul>
+                                <li>You are curious</li>
+                                <li>You intend to write some MapReduce someday</li>
+                            </ul>
+                        </li>
+                        <li class="fragment">As a <strong>developer</strong>, you <strong>should</strong>, do I really need to explain why?</li>
                     </ul>
                 </section>
 
                 <section>
                     <h2>How to make queries scale?</h2>
-                    <div class="fragment fade-in">
+                    <div class="fragment">
                         Run the query on each node<br><br>
-                        <svg height="100" viewBox="0 0 400 100">
-                            <use x="0" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="70" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
-                            <use x="150" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="220" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
-                            <use x="300" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="370" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        <svg height="100">
+                            <use xlink:href="#svg_query_scale_top" />
                         </svg>
                     </div>
                     <div class="fragment">
-                        <svg height="200" viewBox="0 0 400 200">
-                            <path stroke="#FFF" d="M 50 0 L 190 75" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 200 0 L 200 75" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 350 0 L 210 75" marker-end="url(#arrowhead)"/>
-                            <use x="150" y="100" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <svg height="200">
+                            <use xlink:href="#svg_query_scale_bot" />
                         </svg>
                         <br>???
                         <br>Concatenate the results at the end
@@ -126,40 +126,96 @@
                 </section>
 
                 <section>
-                    <h2>So how do we do that? MapReduce</h2>
-                    <div class="fragment fade-in">
-                        <svg height="100" viewBox="0 0 600 100">
-                            <text x="0" y="50" fill="var(--cyan-color)">Map</text>
-                            <use x="200" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="270" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
-                            <use x="350" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="420" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
-                            <use x="500" y="0" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
-                            <use x="570" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
-                        </svg>
-                    </div>
-                    <div class="fragment">
-                        <svg height="150" viewBox="0 0 600 150">
-                            <text x="0" y="150" fill="var(--violet-color)">Reduce</text>
-                            <path stroke="#FFF" d="M 250 0 L 320 45" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 400 0 L 330 45" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 550 0 L 550 45" marker-end="url(#arrowhead)"/>
-                            <use x="275" y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
-                            <use x="500" y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
-                        </svg>
-                        <svg height="150" viewBox="0 0 600 150">
-                            <path stroke="#FFF" d="M 325 0 L 445 45" marker-end="url(#arrowhead)"/>
-                            <path stroke="#FFF" d="M 550 0 L 455 45" marker-end="url(#arrowhead)"/>
-                            <use x="400" y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
-                        </svg>
-                    </div>
-                    <div class="fragment">
-                        <svg height="150" viewBox="0 0 600 150">
-                            <text x="0" y="75" fill="var(--red-color)">Finalize</text>
-                            <path stroke="#FFF" d="M 450 0 L 450 45" marker-end="url(#arrowhead)"/>
-                            <use x="400" y="50" width="100" height="100" fill="var(--red-color)" xlink:href="#svg_process" />
-                        </svg>
-                    </div>
+                    <h2>Let's talk about a story</h2>
+
+                    Your boss
+
+                    <blockquote>
+                        &ldquo;I need you to produce an interline reports for each partner of &lt;unnamed airline&gt; for this year. I need that for when I come back next week from holidays! Use whatever you need.&rdquo;
+                    </blockquote>
+
+                    <ul>
+                        <li class="fragment">The &lt;unnamed airline&gt; likes paper, all the tickets are <strong>printed</strong>.</li>
+                        <li class="fragment">There are <strong>1 million</strong> of them.</li>
+                        <li class="fragment">You <strong>can't use computers</strong>, apparently they don't like them.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>What should you do?</h2>
+
+                    <ul>
+                        <li class="fragment">No, you <strong>can't resign</strong>...</li>
+                        <li class="fragment">You're smart so you leave one team working on <strong>production support</strong>!</li>
+                        <li class="fragment">Ok, let's be serious.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>What should you do? (for real)</h2>
+
+                    <h3>Divide and Conquer</h3>
+                    <p>You create 4 groups of people:</p>
+                    <ul>
+                        <li class="fragment">the Mappers</li>
+                        <li class="fragment">the Groupers</li>
+                        <li class="fragment">the Reducers</li>
+                        <li class="fragment">the Master (Yep that's you!)</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Getting through all the tickets</h2>
+                    <h3>Mappers</h3>
+
+                    <svg height="400">
+                        <use xlink:href="#svg_mapper_job" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>Grouping by partner</h2>
+                    <h3>Groupers</h3>
+
+                    <svg height="400">
+                        <use xlink:href="#svg_grouper_job" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>Summing it</h2>
+
+                    <h3>Reducers</h3>
+
+                    <svg height="400">
+                        <use xlink:href="#svg_reducer_job" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>But what did the Master do?</h2>
+
+                    <ul>
+                        <li class="fragment"><strong>Splitted</strong> the tickets evenly for the Mappers</li>
+                        <li class="fragment"><strong>Coordinated</strong> people</li>
+                        <li class="fragment">If some people <strong>failed</strong>, gave his job to someone else</li>
+                        <li class="fragment">Got the <strong>results back</strong></li>
+                        <li class="fragment">Got the <strong>credits</strong> I guess</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>MapReduce</h2>
+                    <svg height="500">
+                        <use xlink:href="#svg_mapreduce" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>Recursive Reduce</h2>
+                    <svg height="500">
+                        <use xlink:href="#svg_recursive_reduce" />
+                    </svg>
                 </section>
 
                 <section>
@@ -229,15 +285,6 @@ function(month, values) {
                 </section>
 
                 <section>
-                    <h2>Average Finalize</h2>
-                    <pre><code data-trim contenteditable>
-function (month, value) {
-    return value.sum/value.count;
-}
-                    </code></pre>
-                </section>
-
-                <section>
                     <h2>Evolutions ?</h2>
                     <p>Basically they all have approximately the same philosophy as MapReduce</p>
                     <p>Check out RDDs in Spark for example</p>
@@ -286,328 +333,7 @@ function (month, value) {
                     <h2>How does it split the query</h2>
                     <p>...</p>
                 </section>
-
-                <section>
-                    <section>
-                        <h2>Vertical Slides</h2>
-                        <p>Slides can be nested inside of each other.</p>
-                        <p>Use the <em>Space</em> key to navigate through all slides.</p>
-                        <br>
-                        <a href="#" class="navigate-down">
-                            <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-                        </a>
-                    </section>
-                    <section>
-                        <h2>Basement Level 1</h2>
-                        <p>Nested slides are useful for adding additional detail underneath a high level horizontal slide.</p>
-                    </section>
-                    <section>
-                        <h2>Basement Level 2</h2>
-                        <p>That's it, time to go back up.</p>
-                        <br>
-                        <a href="#/2">
-                            <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Up arrow" style="transform: rotate(180deg); -webkit-transform: rotate(180deg);">
-                        </a>
-                    </section>
-                </section>
-
-                <section>
-                    <h2>Slides</h2>
-                    <p>
-                        Not a coder? Not a problem. There's a fully-featured visual editor for authoring these, try it out at <a href="http://slides.com" target="_blank">http://slides.com</a>.
-                    </p>
-                </section>
-
-                <section>
-                    <h2>Point of View</h2>
-                    <p>
-                        Press <strong>ESC</strong> to enter the slide overview.
-                    </p>
-                    <p>
-                        Hold down alt and click on any element to zoom in on it using <a href="http://lab.hakim.se/zoom-js">zoom.js</a>. Alt + click anywhere to zoom back out.
-                    </p>
-                </section>
-
-                <section>
-                    <h2>Touch Optimized</h2>
-                    <p>
-                        Presentations look great on touch devices, like mobile phones and tablets. Simply swipe through your slides.
-                    </p>
-                </section>
-
-                <section data-markdown>
-                    <script type="text/template">
-                        ## Markdown support
-
-                        Write content using inline or external Markdown.
-                        Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
-
-                        ```
-                        <section data-markdown>
-                          ## Markdown support
-
-                          Write content using inline or external Markdown.
-                          Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
-                        </section>
-                        ```
-                    </script>
-                </section>
-
-                <section>
-                    <section id="fragments">
-                        <h2>Fragments</h2>
-                        <p>Hit the next arrow...</p>
-                        <p class="fragment">... to step through ...</p>
-                        <p><span class="fragment">... a</span> <span class="fragment">fragmented</span> <span class="fragment">slide.</span></p>
-
-                        <aside class="notes">
-                            This slide has fragments which are also stepped through in the notes window.
-                        </aside>
-                    </section>
-                    <section>
-                        <h2>Fragment Styles</h2>
-                        <p>There's different types of fragments, like:</p>
-                        <p class="fragment grow">grow</p>
-                        <p class="fragment shrink">shrink</p>
-                        <p class="fragment fade-out">fade-out</p>
-                        <p class="fragment current-visible">current-visible</p>
-                        <p class="fragment highlight-red">highlight-red</p>
-                        <p class="fragment highlight-blue">highlight-blue</p>
-                    </section>
-                </section>
-
-                <section id="transitions">
-                    <h2>Transition Styles</h2>
-                    <p>
-                        You can select from different transitions, like: <br>
-                        <a href="?transition=none#/transitions">None</a> -
-                        <a href="?transition=fade#/transitions">Fade</a> -
-                        <a href="?transition=slide#/transitions">Slide</a> -
-                        <a href="?transition=convex#/transitions">Convex</a> -
-                        <a href="?transition=concave#/transitions">Concave</a> -
-                        <a href="?transition=zoom#/transitions">Zoom</a>
-                    </p>
-                </section>
-
-                <section id="themes">
-                    <h2>Themes</h2>
-                    <p>
-                        reveal.js comes with a few themes built in: <br>
-                        <!-- Hacks to swap themes after the page has loaded. Not flexible and only intended for the reveal.js demo deck. -->
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/black.css'); return false;">Black (default)</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/white.css'); return false;">White</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/league.css'); return false;">League</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/sky.css'); return false;">Sky</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/beige.css'); return false;">Beige</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/simple.css'); return false;">Simple</a> <br>
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/serif.css'); return false;">Serif</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/blood.css'); return false;">Blood</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/night.css'); return false;">Night</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/moon.css'); return false;">Moon</a> -
-                        <a href="#" onclick="document.getElementById('theme').setAttribute('href','css/theme/solarized.css'); return false;">Solarized</a>
-                    </p>
-                </section>
-
-                <section>
-                    <section data-background="#dddddd">
-                        <h2>Slide Backgrounds</h2>
-                        <p>
-                            Set <code>data-background="#dddddd"</code> on a slide to change the background color. All CSS color formats are supported.
-                        </p>
-                        <a href="#" class="navigate-down">
-                            <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-                        </a>
-                    </section>
-                    <section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png">
-                        <h2>Image Backgrounds</h2>
-                        <pre><code>&lt;section data-background="image.png"&gt;</code></pre>
-                    </section>
-                    <section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png" data-background-repeat="repeat" data-background-size="100px">
-                        <h2>Tiled Backgrounds</h2>
-                        <pre><code style="word-wrap: break-word;">&lt;section data-background="image.png" data-background-repeat="repeat" data-background-size="100px"&gt;</code></pre>
-                    </section>
-                    <section data-background-video="https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.mp4,https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.webm" data-background-color="#000000">
-                        <div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
-                            <h2>Video Backgrounds</h2>
-                            <pre><code style="word-wrap: break-word;">&lt;section data-background-video="video.mp4,video.webm"&gt;</code></pre>
-                        </div>
-                    </section>
-                    <section data-background="http://i.giphy.com/90F8aUepslB84.gif">
-                        <h2>... and GIFs!</h2>
-                    </section>
-                </section>
-
-                <section data-transition="slide" data-background="#4d7e65" data-background-transition="zoom">
-                    <h2>Background Transitions</h2>
-                    <p>
-                        Different background transitions are available via the backgroundTransition option. This one's called "zoom".
-                    </p>
-                    <pre><code>Reveal.configure({ backgroundTransition: 'zoom' })</code></pre>
-                </section>
-
-                <section data-transition="slide" data-background="#b5533c" data-background-transition="zoom">
-                    <h2>Background Transitions</h2>
-                    <p>
-                        You can override background transitions per-slide.
-                    </p>
-                    <pre><code style="word-wrap: break-word;">&lt;section data-background-transition="zoom"&gt;</code></pre>
-                </section>
-
-                <section>
-                    <h2>Pretty Code</h2>
-                    <pre><code data-trim contenteditable>
-function linkify( selector ) {
-  if( supports3DTransforms ) {
-
-    var nodes = document.querySelectorAll( selector );
-
-    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
-      var node = nodes[i];
-
-      if( !node.className ) {
-        node.className += ' roll';
-      }
-    }
-  }
-}
-                    </code></pre>
-                    <p>Code syntax highlighting courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
-                </section>
-
-                <section>
-                    <h2>Marvelous List</h2>
-                    <ul>
-                        <li>No order here</li>
-                        <li>Or here</li>
-                        <li>Or here</li>
-                        <li>Or here</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h2>Fantastic Ordered List</h2>
-                    <ol>
-                        <li>One is smaller than...</li>
-                        <li>Two is smaller than...</li>
-                        <li>Three!</li>
-                    </ol>
-                </section>
-
-                <section>
-                    <h2>Tabular Tables</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Value</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Apples</td>
-                                <td>$1</td>
-                                <td>7</td>
-                            </tr>
-                            <tr>
-                                <td>Lemonade</td>
-                                <td>$2</td>
-                                <td>18</td>
-                            </tr>
-                            <tr>
-                                <td>Bread</td>
-                                <td>$3</td>
-                                <td>2</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-
-                <section>
-                    <h2>Clever Quotes</h2>
-                    <p>
-                        These guys come in two forms, inline: <q cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-                        &ldquo;The nice thing about standards is that there are so many to choose from&rdquo;</q> and block:
-                    </p>
-                    <blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-                        &ldquo;For years there has been a theory that millions of monkeys typing at random on millions of typewriters would
-                        reproduce the entire works of Shakespeare. The Internet has proven this theory to be untrue.&rdquo;
-                    </blockquote>
-                </section>
-
-                <section>
-                    <h2>Intergalactic Interconnections</h2>
-                    <p>
-                        You can link between slides internally,
-                        <a href="#/2/3">like this</a>.
-                    </p>
-                </section>
-
-                <section>
-                    <h2>Speaker View</h2>
-                    <p>There's a <a href="https://github.com/hakimel/reveal.js#speaker-notes">speaker view</a>. It includes a timer, preview of the upcoming slide as well as your speaker notes.</p>
-                    <p>Press the <em>S</em> key to try it out.</p>
-
-                    <aside class="notes">
-                        Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open the speaker notes window (hit 's' on your keyboard).
-                    </aside>
-                </section>
-
-                <section>
-                    <h2>Export to PDF</h2>
-                    <p>Presentations can be <a href="https://github.com/hakimel/reveal.js#pdf-export">exported to PDF</a>, here's an example:</p>
-                    <iframe src="//www.slideshare.net/slideshow/embed_code/42840540" width="445" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:3px solid #666; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
-                </section>
-
-                <section>
-                    <h2>Global State</h2>
-                    <p>
-                        Set <code>data-state="something"</code> on a slide and <code>"something"</code>
-                        will be added as a class to the document element when the slide is open. This lets you
-                        apply broader style changes, like switching the page background.
-                    </p>
-                </section>
-
-                <section data-state="customevent">
-                    <h2>State Events</h2>
-                    <p>
-                        Additionally custom events can be triggered on a per slide basis by binding to the <code>data-state</code> name.
-                    </p>
-                    <pre><code class="javascript" data-trim contenteditable style="font-size: 18px;">
-Reveal.addEventListener( 'customevent', function() {
-    console.log( '"customevent" has fired' );
-} );
-                    </code></pre>
-                </section>
-
-                <section>
-                    <h2>Take a Moment</h2>
-                    <p>
-                        Press B or . on your keyboard to pause the presentation. This is helpful when you're on stage and want to take distracting slides off the screen.
-                    </p>
-                </section>
-
-                <section>
-                    <h2>Much more</h2>
-                    <ul>
-                        <li>Right-to-left support</li>
-                        <li><a href="https://github.com/hakimel/reveal.js#api">Extensive JavaScript API</a></li>
-                        <li><a href="https://github.com/hakimel/reveal.js#auto-sliding">Auto-progression</a></li>
-                        <li><a href="https://github.com/hakimel/reveal.js#parallax-background">Parallax backgrounds</a></li>
-                        <li><a href="https://github.com/hakimel/reveal.js#keyboard-bindings">Custom keyboard bindings</a></li>
-                    </ul>
-                </section>
-
-                <section style="text-align: left;">
-                    <h1>THE END</h1>
-                    <p>
-                        - <a href="http://slides.com">Try the online editor</a> <br>
-                        - <a href="https://github.com/hakimel/reveal.js">Source code &amp; documentation</a>
-                    </p>
-                </section>
-
             </div>
-
         </div>
 
         <script src="lib/js/head.min.js"></script>
@@ -623,7 +349,7 @@ Reveal.addEventListener( 'customevent', function() {
                 history: true,
                 center: true,
 
-                transition: 'concave', // none/fade/slide/convex/concave/zoom
+                transition: 'fade', // none/fade/slide/convex/concave/zoom
 
                 // Optional reveal.js plugins
                 dependencies: [
@@ -632,7 +358,8 @@ Reveal.addEventListener( 'customevent', function() {
                     { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
                     { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
                     { src: 'plugin/zoom-js/zoom.js', async: true },
-                    { src: 'plugin/notes/notes.js', async: true }
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/animate/animate.js', async: true, condition: function() { return !!document.body.classList; } }
                 ]
             });
 
@@ -640,6 +367,10 @@ Reveal.addEventListener( 'customevent', function() {
 
         <svg width="0" height="0">
             <defs>
+                <marker id="arrowhead" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path fill="white" stroke="white" d="M 0 0 L 10 5 L 0 10 z" />
+                </marker>
+
                 <symbol id="svg_user" viewBox="0 0 654.348 654.348">
                     <path fill="inherit" d="M466.121,401.586c52.287-41.184,85.985-104.92,85.985-176.654C552.106,100.708,451.398,0,327.174,0
                         S102.242,100.708,102.242,224.932c0,71.733,33.699,135.47,85.985,176.654C94.471,449.373,28.484,543.764,21.184,654.348h40.958
@@ -664,14 +395,301 @@ Reveal.addEventListener( 'customevent', function() {
                     <path fill="inherit" d="M19.945,22l6.008-8L32,22h-4v2c0,3.309-2.691,6-6,6H10c-3.309,0-6-2.691-6-6v-2h4v2c0,1.102,0.898,2,2,2h12c1.102,0,2-0.898,2-2v-2H19.945z"/>
                     <path fill="inherit" d="M12.055,10l-6.008,8L0,10h4V8c0-3.309,2.691-6,6-6h12c3.309,0,6,2.691,6,6v2h-4V8c0-1.102-0.898-2-2-2H10C8.898,6,8,6.898,8,8v2H12.055z"/>
                 </symbol>
-                <marker id="arrowhead"
-                        viewBox="0 0 10 10"
-                        refX="1" refY="5"
-                        markerWidth="6"
-                        markerHeight="6"
-                        orient="auto">
-                    <path fill="#FFF" stroke="#FFF" d="M 0 0 L 10 5 L 0 10 z" />
-                </marker>
+                <symbol id="svg_flight_ticket" viewBox="0 0 476.801 476.801">
+                    <path fill="inherit" d="M468.801,115.2H8c-4.418,0-8,3.582-8,8v230.4c0,4.418,3.582,8,8,8h460.801c4.418,0,8-3.582,8-8V123.2  C476.801,118.782,473.219,115.2,468.801,115.2z M460.801,345.601h-176v-16.616c0-4.418-3.582-8-8-8s-8,3.582-8,8v16.616H16V131.2  h252.801v145.599c0,4.418,3.582,8,8,8s8-3.582,8-8V131.2h176V345.601z M238.4,237.798L238.4,237.798  c0.001,11.888-12.362,21.525-27.613,21.525l-41.421-2.691l-20.301,67.417h-21.12v-70.108l-41.686-2.708l-10.726,27.257  l-16.389,3.927v-32.945l-0.281-0.019c-7.777-0.505-13.759-5.573-13.759-11.656h-0.001c0-6.083,5.982-11.151,13.759-11.656  l0.281-0.019v-32.132l16.389,3.926l10.414,26.465l42.408-2.755v-69.627h20.301l20.973,66.946l41.159-2.674  C226.037,216.273,238.4,225.91,238.4,237.798z M448,223.625c0,4.418-3.582,8-8,8H324.801c-4.418,0-8-3.582-8-8s3.582-8,8-8H440  C444.418,215.625,448,219.207,448,223.625z M448,310.4c0,4.418-3.582,8-8,8H324.801c-4.418,0-8-3.582-8-8s3.582-8,8-8H440  C444.418,302.4,448,305.982,448,310.4z M448,281.601c0,4.418-3.582,8-8,8H334.775c-4.418,0-8-3.582-8-8s3.582-8,8-8H440  C444.418,273.601,448,277.183,448,281.601z M448,252.425c0,4.418-3.582,8-8,8h-86.399c-4.418,0-8-3.582-8-8s3.582-8,8-8H440  C444.418,244.425,448,248.007,448,252.425z M310.4,203.2H440c4.418,0,8-3.582,8-8V152c0-4.418-3.582-8-8-8H310.4  c-4.418,0-8,3.582-8,8v43.2C302.4,199.618,305.982,203.2,310.4,203.2z M318.4,160H432v27.2H318.4V160z"/>
+                </symbol>
+                <symbol id="svg_box" viewBox="0 0 551.852 551.852">
+                    <path fill="inherit" d="M545.933,106.575l0.377-0.999L276.049,0L6.228,106.671l-0.881-0.35v0.684l-0.038,0.021l0.038,0.115v338.651  l270.579,106.059l270.617-106.064V106.326L545.933,106.575z M275.797,20.755l91.666,32.829L117.578,150.6l-84.647-33.39   L275.797,20.755z M266.281,527.927L164.94,487.013l-50.859-19.107l-89.396-35.267V134.737l88.499,34.909v74.49l7.887-2.202   l5.33,7.324l7.421-1.732l7.187,7.592l6.272-2.161l10.125,10.041v-75.911l7.877,3.11l100.999,39.834V527.927L266.281,527.927z    M275.948,213.077l-98.808-38.983L420.832,75.33l100.504,40.944L275.948,213.077z M527.218,432.639l-241.612,95.288V230.032   l241.589-95.301v297.901L527.218,432.639L527.218,432.639z"/>
+                </symbol>
+                <symbol id="svg_documents" viewBox="0 0 256.51 256.51">
+                    <path fill="inherit" d="M60.859,112.533c-6.853,0-6.853,10.646,0,10.646c27.294,0,54.583,0,81.875,0c6.865,0,6.865-10.646,0-10.646     C115.442,112.533,88.153,112.533,60.859,112.533z"/>
+                    <path fill="inherit" d="M142.734,137.704c-27.292,0-54.581,0-81.875,0c-6.853,0-6.853,10.634,0,10.634c27.294,0,54.583,0,81.875,0     C149.6,148.338,149.6,137.704,142.734,137.704z"/>
+                    <path fill="inherit" d="M142.734,161.018c-27.292,0-54.581,0-81.875,0c-6.853,0-6.853,10.633,0,10.633c27.294,0,54.583,0,81.875,0     C149.6,171.65,149.6,161.018,142.734,161.018z"/>
+                    <path fill="inherit" d="M142.734,186.184c-27.292,0-54.581,0-81.875,0c-6.853,0-6.853,10.629,0,10.629c27.294,0,54.583,0,81.875,0     C149.6,196.812,149.6,186.184,142.734,186.184z"/>
+                    <path fill="inherit" d="M141.17,209.934c-27.302,0-54.601,0-81.89,0c-6.848,0-6.848,10.633,0,10.633c27.289,0,54.588,0,81.89,0     C148.015,220.566,148.015,209.934,141.17,209.934z"/>
+                    <path fill="inherit" d="M25.362,58.087V256.61h152.877V85.63l-28.406-27.543H25.362z M165.026,243.393H38.585V71.305h104.443v20.97h21.988     v151.118H165.026z"/>
+                    <polygon fill="inherit" points="51.204,27.667 51.204,50.645 64.427,50.645 64.427,40.88 168.875,40.88 168.875,61.85 190.868,61.85      190.868,212.971 185.059,212.971 185.059,226.188 204.086,226.188 204.086,55.205 175.68,27.667    "/>
+                    <polygon fill="inherit" points="202.837,0 78.363,0 78.363,22.983 91.581,22.983 91.581,13.218 196.032,13.218 196.032,34.188 218.025,34.188      218.025,185.306 212.221,185.306 212.221,198.523 231.248,198.523 231.248,27.543    "/>
+                </symbol>
+                <symbol id="svg_document" viewBox="0 0 45.057 45.057">
+                    <path fill="inherit" d="M13.323,13.381c6.418,0,12.834,0,19.252,0c1.613,0,1.613-2.5,0-2.5c-6.418,0-12.834,0-19.252,0     C11.711,10.881,11.711,13.381,13.323,13.381z"></path>
+                    <path fill="inherit" d="M32.577,16.798c-6.418,0-12.835,0-19.253,0c-1.612,0-1.612,2.5,0,2.5c6.418,0,12.835,0,19.253,0     C34.188,19.298,34.188,16.798,32.577,16.798z"></path>
+                    <path fill="inherit" d="M32.577,22.281c-6.418,0-12.835,0-19.253,0c-1.612,0-1.612,2.5,0,2.5c6.418,0,12.835,0,19.253,0     C34.188,24.781,34.188,22.281,32.577,22.281z"></path>
+                    <path fill="inherit" d="M32.577,28.197c-6.418,0-12.835,0-19.253,0c-1.612,0-1.612,2.5,0,2.5c6.418,0,12.835,0,19.253,0     C34.188,30.697,34.188,28.197,32.577,28.197z"></path>
+                    <path fill="inherit" d="M32.204,33.781c-6.418,0-12.834,0-19.252,0c-1.612,0-1.612,2.5,0,2.5c6.418,0,12.834,0,19.252,0     C33.817,36.281,33.817,33.781,32.204,33.781z"></path>
+                    <path fill="inherit" d="M33.431,0H5.179v45.057h34.699V6.251L33.431,0z M36.878,42.056H8.179V3h23.707v4.76h4.992V42.056z"></path>
+                </symbol>
+                <symbol id="svg_profit" viewBox="0 0 473.302 473.302">
+                    <path fill="inherit" d="M303.173,97.537c7.046-1.797,12.326-5.893,5.854-12.725c-0.784-0.818-2.041-0.537-2.61,0.331    c-1.862,2.823-6.119,3.765-11.088,3.63c1.54-0.448,2.759-1.236,3.453-2.514c2.518-4.646,0.114-8.58-3.529-11.874    c-1.312-1.204-2.806-1.957-4.384-2.386c9.801-17.28,20.418-37.918,27.524-57.262c16.664-45.195-52.326,30.931-76.115,17.5    c-23.792-13.415-14.265-55.558-54.709-15.124c-28.477,28.495,15.779,54.594,44.46,67.56c-5.809,0.812-11.608,1.321-17.33,1.31    c-6.437,0-12.859-0.194-19.279-0.723c-5.185-0.418-18.346-0.89-20.805-6.902c-0.796-1.956-3.997-1.097-3.189,0.881    c2.729,6.679,12.178,7.898,18.413,8.722c6.796,0.87,13.704,1.284,20.602,1.368c-0.083,0.011-0.179,0.027-0.263,0.038    c-16.928,2.208-34.011,4.892-50.367,9.896c-5.812,1.781-20.543,5.795-19.393,14.362c0.278,2.079,3.595,2.112,3.315,0    c-1.289-9.656,27.636-14.115,33.599-15.409c16.692-3.62,33.69-5.888,50.693-7.592c-42.608,20.944-99.824,77.461-112.605,148.755    c10.008-3.157,20.642-4.867,31.676-4.867c31.895,0,61.744,14.236,81.898,39.046l0.505,0.624    c7.299-1.604,14.875-2.474,22.646-2.474c58.167,0,105.483,47.316,105.483,105.484c0,5.553-0.433,10.997-1.264,16.322    c37.297-23.207,61.445-64.176,61.445-125.16C417.814,184.367,360.949,126.366,303.173,97.537z M283.592,84.492    c1.745-2.935,3.595-6.054,5.456-9.294c0.406,0.068,0.814,0.117,1.238,0.224c4.607,1.391,6.14,4.571,4.551,9.56    c-1.751,0.712-4.181,0.37-5.998,0.241C287.072,85.11,285.337,84.823,283.592,84.492z M297.803,94.927    c-2.395-1.116-4.78-2.18-7.172-3.201c6.832,0.785,13.41,0.164,17.131-3.152c2.747,4.667-5.784,5.942-9.379,6.336    C298.177,94.927,298,94.922,297.803,94.927z M180.306,300.031v-0.104c0.017,0.021,0.04,0.027,0.063,0.048    C180.346,299.998,180.33,300.021,180.306,300.031z M151.813,415.966c2.202,6.54,5.089,12.738,8.544,18.594    c-5.262,0.984-10.662,1.554-16.202,1.554c-48.97,0-88.664-39.703-88.664-88.667c0-48.965,39.694-88.663,88.664-88.663    c27.797,0,52.584,12.812,68.839,32.826c-6.539,2.263-12.747,5.199-18.574,8.733c-12.581-13.428-30.42-21.855-50.266-21.855    c-38.089,0-68.961,30.878-68.961,68.964c0,38.085,30.872,68.969,68.961,68.969C146.749,416.409,149.299,416.24,151.813,415.966z     M160.549,334.39c-8.785,14.741-13.928,31.882-13.928,50.25c0,5.085,0.502,10.057,1.261,14.943h-8.988v-69.828    c-4.713,1.428-10.447,2.123-17.289,2.123h-4.929v-19.142h4.929c15.825,0,19.054-7.294,20.102-12.766l0.761-3.994h18.082V334.39z     M249.217,295.977c-48.968,0-88.668,39.699-88.668,88.663c0,48.957,39.695,88.662,88.668,88.662    c48.969,0,88.662-39.705,88.662-88.662C337.869,335.676,298.177,295.977,249.217,295.977z M249.217,453.608    c-38.087,0-68.961-30.883-68.961-68.969c0-38.08,30.874-68.964,68.961-68.964c38.085,0,68.958,30.884,68.958,68.964    C318.175,422.726,287.302,453.608,249.217,453.608z M247.516,333.169h18.09v103.602h-21.656v-69.827    c-4.72,1.43-10.444,2.134-17.292,2.134h-4.926v-19.142h4.926c15.83,0,19.052-7.294,20.114-12.771L247.516,333.169z"></path>
+                </symbol>
+
+                <!-- slides -->
+
+                <symbol id="svg_query_cluster" viewBox="0 0 600 150">
+                    <use y="25" width="100" height="100" fill="var(--green-color)" xlink:href="#svg_user" />
+                    <path stroke="white" d="M 125 75 L 275 75" marker-end="url(#arrowhead)"/>
+                    <g transform="translate(300 0)">
+                        <use width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                        <use x="200" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                        <use x="100" y="50" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                    </g>
+                </symbol>
+                <symbol id="svg_query_node" viewBox="0 0 600 100">
+                    <use width="100" height="100" fill="var(--green-color)" xlink:href="#svg_user" />
+                    <path stroke="white" d="M 125 50 L 375 50" marker-end="url(#arrowhead)"/>
+                    <use x="400" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                </symbol>
+
+                <symbol id="svg_query_scale_top" viewBox="0 0 400 100">
+                    <defs>
+                        <symbol id="svg_query_scale_top_db_process" viewBox="0 0 100 100">
+                            <use width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_database" />
+                            <use x="70" y="70" width="30" height="30" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        </symbol>
+                    </defs>
+                    <use width="100" height="100" xlink:href="#svg_query_scale_top_db_process" />
+                    <use x="150" width="100" height="100" xlink:href="#svg_query_scale_top_db_process" />
+                    <use x="300" width="100" height="100" xlink:href="#svg_query_scale_top_db_process" />
+                </symbol>
+                <symbol id="svg_query_scale_bot" viewBox="0 0 400 200">
+                    <path stroke="white" d="M 50 0 L 190 75" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 200 0 L 200 75" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 350 0 L 210 75" marker-end="url(#arrowhead)"/>
+                    <use x="150" y="100" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
+                </symbol>
+
+                <symbol id="svg_mapper_job" viewBox="0 0 700 320">
+                    <g>
+                        <use y="-25" width="175" height="175" fill="var(--blue-color)" xlink:href="#svg_flight_ticket" />
+                        <use y="72.5" width="175" height="175" fill="var(--blue-color)" xlink:href="#svg_flight_ticket" />
+                        <use y="170" width="175" height="175" fill="var(--blue-color)" xlink:href="#svg_flight_ticket" />
+                    </g>
+                    <path stroke="white" d="M 225 160 L 275 160" marker-end="url(#arrowhead)"/>
+                    <g transform="translate(300 0)">
+                        <rect width="400" height="320" fill="var(--cyan-color)" />
+                        <g transform="translate(25 50)">
+                            <text font-size="40" fill="white">
+                                <tspan x="0" y="0">AA, 125</tspan>
+                                <tspan x="0" y="50">UK, -15</tspan>
+                                <tspan x="0" y="100">US, 68</tspan>
+                                <tspan x="0" y="150">...</tspan>
+                                <tspan x="0" y="250">&lt;airline&gt;,&lt;amount&gt;</tspan>
+                            </text>
+                        </g>
+                    <g>
+                </symbol>
+
+                <symbol id="svg_grouper_job" viewBox="0 0 500 320">
+                    <g>
+                        <rect width="70" height="90" fill="var(--cyan-color)" />
+                        <rect y="110" width="70" height="90" fill="var(--cyan-color)" />
+                        <rect y="220" width="70" height="90" fill="var(--cyan-color)" />
+                        <g transform="translate(5 20)">
+                            <text font-size="15" fill="white">
+                                <tspan x="0" y="0" font-weight="bold">AA, 125</tspan>
+                                <tspan x="0" y="20">UK, -15</tspan>
+                                <tspan x="0" y="40">US, 68</tspan>
+                                <tspan x="0" y="60">...</tspan>
+                                <tspan x="0" y="110">JJ, 37</tspan>
+                                <tspan x="0" y="130" font-weight="bold">AA, 75</tspan>
+                                <tspan x="0" y="150">US, 32</tspan>
+                                <tspan x="0" y="170">...</tspan>
+                                <tspan x="0" y="220" font-weight="bold">AA, -27</tspan>
+                                <tspan x="0" y="240">JJ, 33</tspan>
+                                <tspan x="0" y="260" font-weight="bold">AA, 68</tspan>
+                                <tspan x="0" y="280">...</tspan>
+                            </text>
+                        </g>
+                    </g>
+                    <path stroke="white" d="M 125 160 L 275 160" marker-end="url(#arrowhead)"/>
+                    <g transform="translate(300 0)">
+                        <rect width="200" height="320" fill="var(--red-color)" />
+                        <g transform="translate(25 50)">
+                            <text fill="white">
+                                <tspan x="0" y="0" font-weight="bold">AA</tspan>
+                                <tspan x="0" y="100">125</tspan>
+                                <tspan x="0" y="150">75</tspan>
+                                <tspan x="0" y="200">-27</tspan>
+                                <tspan x="0" y="250">68</tspan>
+                            </text>
+                        </g>
+                    </g>
+                </symbol>
+
+                <symbol id="svg_reducer_job" viewBox="0 0 500 320">
+                    <g>
+                        <rect x="0" y="0" width="200" height="320" fill="var(--red-color)" />
+                        <g transform="translate(25 50)">
+                            <text fill="white">
+                                <tspan x="0" y="0" font-weight="bold">AA</tspan>
+                                <tspan x="0" y="100">125</tspan>
+                                <tspan x="0" y="150">75</tspan>
+                                <tspan x="0" y="200">-27</tspan>
+                                <tspan x="0" y="250">68</tspan>
+                            </text>
+                        </g>
+                    </g>
+                    <path stroke="white" d="M 225 160 L 275 160" marker-end="url(#arrowhead)"/>
+                    <g transform="translate(300 75)">
+                        <rect width="200" height="170" fill="var(--violet-color)" />
+                        <g transform="translate(25 50)">
+                            <text fill="white">
+                                <tspan x="0" y="0">AA</tspan>
+                                <tspan x="0" y="100">241</tspan>
+                            </text>
+                        </g>
+                    </g>
+                </symbol>
+
+                <symbol id="svg_mapreduce" viewBox="0 0 1100 500">
+                    <path stroke="white" stroke-dasharray="10,10" d="M 300 0 L 300 500" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 500 0 L 500 500" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 700 0 L 700 500" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 900 0 L 900 500" />
+                    <g>
+                        <use y="150" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_box" />
+                        <text font-size="50" y="480" fill="white">Split Inputs</text>
+                        <g transform="translate(100 0)">
+                            <path stroke="white" d="M 10 200 L 90 50" marker-end="url(#arrowhead)"/>
+                            <path stroke="white" d="M 10 200 L 90 200" marker-end="url(#arrowhead)"/>
+                            <path stroke="white" d="M 10 200 L 90 350" marker-end="url(#arrowhead)"/>
+                        </g>
+                        <g transform="translate(200 0)">
+                            <use width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_documents" />
+                            <use y="150" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_documents" />
+                            <use y="300" width="100" height="100" fill="var(--blue-color)" xlink:href="#svg_documents" />
+                        </g>
+                    </g>
+                    <g transform="translate(300 0)">
+                        <rect width="200" height="500" fill="white" opacity="0.1" />
+                        <text font-size="30" x="20" y="430" fill="white" font-weight="bold">&lt;key, value&gt;</text>
+                        <text font-size="50" x="50" y="480" fill="white" font-weight="bold">Map</text>
+                        <use width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        <use y="150" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        <use y="300" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        <g transform="translate(100 0)">
+                            <use width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                            <use y="150" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                            <use y="300" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(500 0)">
+                        <text font-size="30" x="0" y="430" fill="white" font-weight="bold">&lt;groupby key&gt;</text>
+                        <text font-size="50" x="20" y="480" fill="white">Shuffle</text>
+                        <path stroke="white" d="M 10 50 L 90 40" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 50 L 90 140" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 50 L 90 240" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 50 L 90 340" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 200 L 90 50" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 200 L 90 150" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 200 L 90 250" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 200 L 90 350" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 350 L 90 60" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 350 L 90 160" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 350 L 90 260" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 350 L 90 360" marker-end="url(#arrowhead)"/>
+                        <g transform="translate(100 0)">
+                            <use y="5" width="100" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="105" width="100" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="205" width="100" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="305" width="100" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(700 0)">
+                        <rect width="200" height="500" fill="white" opacity="0.1" />
+                        <text font-size="30" x="15" y="430" fill="white" font-weight="bold">&lt;aggregate&gt;</text>
+                        <text font-size="50" x="15" y="480" fill="white" font-weight="bold">Reduce</text>
+                        <use y="5" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="105" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="205" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="305" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <g transform="translate(100 0)">
+                            <use y="5" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="105" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="205" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="305" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(900 0)">
+                        <text font-size="50" x="50" y="480" fill="white">Collect</text>
+                        <path stroke="white" d="M 10 50 L 90 185" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 150 L 90 195" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 250 L 90 205" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 350 L 90 215" marker-end="url(#arrowhead)"/>
+                        <use x="100" y="150" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_profit" />
+                    </g>
+                </symbol>
+
+                <symbol id="svg_recursive_reduce" viewBox="0 0 1000 500">
+                    <path stroke="white" stroke-dasharray="10,10" d="M 0 200 L 600 200" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 200 0 L 200 500" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 400 0 L 400 500" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 600 0 L 600 500" />
+                    <path stroke="white" stroke-dasharray="10,10" d="M 800 0 L 800 500" />
+                    <g>
+                        <rect width="200" height="500" fill="white" opacity="0.1" />
+                        <text font-size="30" x="20" y="430" fill="white" font-weight="bold">&lt;key, value&gt;</text>
+                        <text font-size="50" x="50" y="480" fill="white" font-weight="bold">Map</text>
+                        <use y="50" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        <use y="250" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_process" />
+                        <g transform="translate(100 0)">
+                            <use y="50" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                            <use y="250" width="100" height="100" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(200 0)">
+                        <text font-size="30" x="0" y="430" fill="white" font-weight="bold">&lt;groupby key&gt;</text>
+                        <text font-size="50" x="20" y="480" fill="white">Shuffle</text>
+                        <path stroke="white" d="M 10 100 L 90 50" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 100 L 90 150" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 300 L 90 250" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 300 L 90 350" marker-end="url(#arrowhead)"/>
+                        <g transform="translate(100 0)">
+                            <use y="5" width="90" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="105" width="90" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="205" width="90" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="305" width="90" height="90" fill="var(--red-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(400 0)">
+                        <rect width="200" height="500" fill="white" opacity="0.1" />
+                        <text font-size="30" x="15" y="430" fill="white" font-weight="bold">&lt;aggregate&gt;</text>
+                        <text font-size="50" x="15" y="480" fill="white" font-weight="bold">Reduce</text>
+                        <use y="5" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="105" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="205" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="305" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <g transform="translate(100 0)">
+                            <use y="5" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="105" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="205" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="305" width="100" height="90" fill="var(--violet-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(600 0)">
+                        <text font-size="30" x="0" y="430" fill="white" font-weight="bold">&lt;groupby key&gt;</text>
+                        <text font-size="50" x="20" y="480" fill="white">Shuffle</text>
+                        <path stroke="white" d="M 10 50 L 90 95" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 150 L 90 295" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 250 L 90 105" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 350 L 90 305" marker-end="url(#arrowhead)"/>
+                        <g transform="translate(100 0)">
+                            <use y="50" width="100" height="100" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="250" width="100" height="100" fill="var(--red-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                    <g transform="translate(800 0)">
+                        <rect width="200" height="500" fill="white" opacity="0.1" />
+                        <text font-size="30" x="15" y="430" fill="white" font-weight="bold">&lt;aggregate&gt;</text>
+                        <text font-size="50" x="15" y="480" fill="white" font-weight="bold">Reduce</text>
+                        <use y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <use y="250" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_process" />
+                        <g transform="translate(100 0)">
+                            <use y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_document" />
+                            <use y="250" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_document" />
+                        </g>
+                    </g>
+                </symbol>
             </defs>
         </svg>
     </body>

@@ -70,7 +70,7 @@
                 </section>
 
                 <section>
-                    <h2>What do you mean by Scale?</h2>
+                    <h2>What do I mean by Scale?</h2>
                     <div class="fragment">
                         Querying a database in a cluster (Most NoSQL databases)<br><br>
                         <svg height="150">
@@ -87,7 +87,7 @@
                 </section>
 
                 <section>
-                    <h2>Why should I care about how it works?</h2>
+                    <h2>Why should you care about how it works?</h2>
                     <ul>
                         <li class="fragment">
                             As a <strong>user</strong>, you should <strong>not</strong>, unless:
@@ -128,7 +128,7 @@
                 <section>
                     <h2>Let's talk about a story</h2>
 
-                    Your boss
+                    <p>Your boss</p>
 
                     <blockquote>
                         &ldquo;I need you to produce an interline reports for each partner of &lt;unnamed airline&gt; for this year. I need that for when I come back next week from holidays! Use whatever you need.&rdquo;
@@ -219,12 +219,20 @@
                 </section>
 
                 <section>
+                    <h2>Important property of the Reduce function</h2>
+                    <h3>Associativity</h3>
+                    <svg class="fragment" height="100">
+                        <use xlink:href="#svg_reduce_associative" />
+                    </svg>
+                    <br><br>
+                    <pre class="fragment"><code>reduce([ reduce([ A, B ]), C ]) = reduce([ A, reduce([ B, C ]) ])</pre></code>
+                </section>
+
+                <section>
                     <h2>Sum</h2>
                     <pre><code data-trim>
-SELECT
-    SUM(amount)
-FROM
-    SALES
+SELECT SUM(amount)
+FROM SALES
 GROUP BY agency;
                     </code></pre>
                     <table class="stretch">
@@ -240,7 +248,7 @@ function(sale) {
                             <td>Reduce</td>
                             <td><pre><code data-trim>
 function(agency, amounts) {
-    return Array.sum(amounts);
+    return sum(amounts);
 }
                             </code></pre></td>
                         </tr>
@@ -248,14 +256,39 @@ function(agency, amounts) {
                 </section>
 
                 <section>
-                    <h2>Average (Map)</h2>
+                    <h2>Average</h2>
                     <pre><code data-trim>
-SELECT
-    AVG(amount)
-FROM
-    SALES
-GROUP BY
-    month;
+SELECT AVG(amount)
+FROM SALES
+GROUP BY month;
+                    </code></pre>
+                    <table class="stretch">
+                        <tr class="fragment">
+                            <td>Map</td>
+                            <td><pre><code data-trim>
+function(sale) {
+    emit(sale.month, sale.amount);
+}
+                            </code></pre></td>
+                        </tr>
+                        <tr class="fragment">
+                            <td>Reduce</td>
+                            <td><pre><code data-trim>
+function(month, amounts) {
+    return avg(amounts);
+}
+                            </code></pre></td>
+                        </tr>
+                    </table>
+                    <h2 class="fragment" style="color: var(--red-color)">Wrong</h3>
+                </section>
+
+                <section>
+                    <h2>Average (For Real)</h2>
+                    <pre><code data-trim>
+SELECT AVG(amount)
+FROM SALES
+GROUP BY month;
                     </code></pre>
                     <pre class="fragment"><code data-trim contenteditable>
 function(sale) {
@@ -265,48 +298,74 @@ function(sale) {
     });
 }
                     </code></pre>
-                </section>
-
-                <section>
-                    <h2>Average Reduce</h2>
-                    <pre><code data-trim contenteditable>
+                    <pre class="fragment"><code data-trim contenteditable>
 function(month, values) {
-    var reduced_value = {
-        count: 0,
-        sum: 0
+    return {
+        count: sum(value.count for value in values),
+        sum: sum(value.sum for value in values)
     };
-    values.forEach(function (value) {
-        reduced_value.count += value.count;
-        reduced_value.sum += value.sum;
-    });
-    return reduced_value;
 }
                     </code></pre>
                 </section>
 
                 <section>
                     <h2>Evolutions ?</h2>
-                    <p>Basically they all have approximately the same philosophy as MapReduce</p>
-                    <p>Check out RDDs in Spark for example</p>
+                    <p>HDFS / MapR?</p>
+                    <p>Spark ?</p>
                 </section>
 
                 <section>
                     <h2>What about MongoDB ?</h2>
-                    <p>You can do plain MapReduce</p>
-                    <p>But it also exists the Aggregation Framework</p>
+                    <ul>
+                        <li>You can do plain MapReduce</li>
+                        <li>But you can also use the Aggregation Framework</li>
+                    </ul>
                 </section>
 
                 <section>
                     <h2>What is the aggregation Framework ?</h2>
-                    <p>Simplified MapReduce</p>
-                    <p>Written in C++ for speed</p>
-                    <p>Splitting the query is handled by the engine, but of course you have less freedom</p>
+                    <ul>
+                        <li>Simplified MapReduce</li>
+                        <li>Written in C++ for speed</li>
+                        <li>Splitting the query is handled by the engine, but of course you have less freedom</li>
+                    </ul>
                 </section>
 
                 <section>
                     <h2>How to write a query using Aggregation Framework ?</h2>
-                    <p>Think of it as a pipeline, a series of processes your data will go through, in order</p>
+                    <p>Think of it as a pipeline, a series of processes your data will go through, one by one</p>
                     <p>Several operations for a pipeline ...</p>
+                </section>
+
+                <section>
+                    <h2>$match (filter)</h2>
+                    <h3>SQL WHERE</h3>
+                    <svg height="320">
+                        <use xlink:href="#svg_af_match" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>$project (reshape)</h2>
+                    <h3>SQL SELECT</h3>
+                    <svg height="320">
+                        <use xlink:href="#svg_af_project" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>$group</h2>
+                    <h3>SQL GROUP BY</h3>
+                    <svg height="320">
+                        <use xlink:href="#svg_af_group" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>$unwind</h2>
+                    <svg height="320">
+                        <use xlink:href="#svg_af_unwind" />
+                    </svg>
                 </section>
 
                 <section>
@@ -411,6 +470,9 @@ function(month, values) {
                     <polygon fill="inherit" points="51.204,27.667 51.204,50.645 64.427,50.645 64.427,40.88 168.875,40.88 168.875,61.85 190.868,61.85      190.868,212.971 185.059,212.971 185.059,226.188 204.086,226.188 204.086,55.205 175.68,27.667    "/>
                     <polygon fill="inherit" points="202.837,0 78.363,0 78.363,22.983 91.581,22.983 91.581,13.218 196.032,13.218 196.032,34.188 218.025,34.188      218.025,185.306 212.221,185.306 212.221,198.523 231.248,198.523 231.248,27.543    "/>
                 </symbol>
+                <symbol id="svg_empty_document" viewBox="0 0 45.057 45.057">
+                    <path fill="inherit" d="M33.431,0H5.179v45.057h34.699V6.251L33.431,0z M36.878,42.056H8.179V3h23.707v4.76h4.992V42.056z"></path>
+                </symbol>
                 <symbol id="svg_document" viewBox="0 0 45.057 45.057">
                     <path fill="inherit" d="M13.323,13.381c6.418,0,12.834,0,19.252,0c1.613,0,1.613-2.5,0-2.5c-6.418,0-12.834,0-19.252,0     C11.711,10.881,11.711,13.381,13.323,13.381z"></path>
                     <path fill="inherit" d="M32.577,16.798c-6.418,0-12.835,0-19.253,0c-1.612,0-1.612,2.5,0,2.5c6.418,0,12.835,0,19.253,0     C34.188,19.298,34.188,16.798,32.577,16.798z"></path>
@@ -513,11 +575,11 @@ function(month, values) {
                 <symbol id="svg_grouper_job" viewBox="0 0 500 320">
                     <g>
                         <rect width="70" height="90" fill="var(--cyan-color)" />
-                        <rect width="35" height="90" fill="white" opacity="0.1"/>
+                        <rect width="30" height="90" fill="white" opacity="0.1"/>
                         <rect y="110" width="70" height="90" fill="var(--cyan-color)" />
-                        <rect y="110" width="35" height="90" fill="white" opacity="0.1"/>
+                        <rect y="110" width="30" height="90" fill="white" opacity="0.1"/>
                         <rect y="220" width="70" height="90" fill="var(--cyan-color)" />
-                        <rect y="220" width="35" height="90" fill="white" opacity="0.1"/>
+                        <rect y="220" width="30" height="90" fill="white" opacity="0.1"/>
                         <g transform="translate(5 20)">
                             <text font-size="15" fill="white">
                                 <tspan x="0" y="0" font-weight="bold">AA</tspan>
@@ -741,6 +803,131 @@ function(month, values) {
                             <use y="50" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_reducedocument" />
                             <use y="250" width="100" height="100" fill="var(--violet-color)" xlink:href="#svg_reducedocument" />
                         </g>
+                    </g>
+                </symbol>
+
+                <symbol id="svg_reduce_associative" viewBox="0 0 620 50">
+                    <use x="65" y="0" width="50" height="50" fill="var(--violet-color)" xlink:href="#svg_process" />
+                    <use x="190" y="0" width="50" height="50" fill="var(--violet-color)" xlink:href="#svg_process" />
+                    <use x="375" y="0" width="50" height="50" fill="var(--violet-color)" xlink:href="#svg_process" />
+                    <use x="500" y="0" width="50" height="50" fill="var(--violet-color)" xlink:href="#svg_process" />
+                    <g transform="translate(0 45)">
+                        <text font-size="50" fill="white" font-weight="bold">
+                            <tspan x="0" y="0">( A</tspan>
+                            <tspan x="125" y="0">B )</tspan>
+                            <tspan x="250" y="0">C = A</tspan>
+                            <tspan x="435" y="0">( B</tspan>
+                            <tspan x="560" y="0">C )</tspan>
+                        </text>
+                    </g>
+                </symbol>
+
+                <symbol id="svg_af_match" viewBox="0 0 500 320">
+                    <g transform="translate(200 0)">
+                        <rect width="100" height="320" fill="var(--blue-color)" />
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$match</text>
+                    </g>
+                    <g>
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                    </g>
+                    <g transform="translate(0 110)">
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 310 50 L 390 50" marker-end="url(#arrowhead)"/>
+                        <use x="400" width="100" height="100" fill="white" xlink:href="#svg_document" />
+                    </g>
+                    <g transform="translate(0 220)">
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                    </g>
+                </symbol>
+
+                <symbol id="svg_af_project" viewBox="0 0 500 320">
+                    <g transform="translate(200 0)">
+                        <rect width="100" height="320" fill="var(--violet-color)" />
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$project</text>
+                    </g>
+                    <g>
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 310 50 L 390 50" marker-end="url(#arrowhead)"/>
+                        <use x="400" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                    </g>
+                    <g transform="translate(0 110)">
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 310 50 L 390 50" marker-end="url(#arrowhead)"/>
+                        <use x="400" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                    </g>
+                    <g transform="translate(0 220)">
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 310 50 L 390 50" marker-end="url(#arrowhead)"/>
+                        <use x="400" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                    </g>
+                </symbol>
+
+                <symbol id="svg_af_group" viewBox="0 0 500 320">
+                    <g transform="translate(200 0)">
+                        <rect width="100" height="320" fill="var(--orange-color)" />
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$group</text>
+                    </g>
+                    <g>
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                    </g>
+                    <g transform="translate(0 110)">
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                    </g>
+                    <g transform="translate(0 220)">
+                        <use width="100" height="100" fill="white" xlink:href="#svg_document" />
+                        <path stroke="white" d="M 110 50 L 190 50" marker-end="url(#arrowhead)"/>
+                    </g>
+
+                    <g transform="translate(300 0)">
+                        <path stroke="white" d="M 10 50 L 90 100" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 10 160 L 90 110" marker-end="url(#arrowhead)"/>
+                        <use x="100" y="55" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_document" />
+
+                        <path stroke="white" d="M 10 270 L 90 270" marker-end="url(#arrowhead)"/>
+                        <use x="100" y="220" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                    </g>
+                </symbol>
+
+                <symbol id="svg_af_unwind" viewBox="0 0 700 320">
+                    <g transform="translate(400 0)">
+                        <rect width="100" height="320" fill="var(--green-color)" />
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$unwind: cpn</text>
+                    </g>
+                    <g>
+                        <use width="300" height="300" fill="white" xlink:href="#svg_empty_document" />
+                        <text x="65" y="50" font-size="30" fill="white" font-weight="bold">cpn:</text>
+                        <g transform="translate(120 0)">
+                            <use y="30" width="70" height="70" fill="var(--blue-color)" xlink:href="#svg_document" />
+                            <use y="110" width="70" height="70" fill="var(--red-color)" xlink:href="#svg_document" />
+                            <use y="190" width="70" height="70" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                        </g>
+                        <path stroke="white" d="M 310 150 L 390 150" marker-end="url(#arrowhead)"/>
+                    </g>
+                    <g transform="translate(500 0)">
+                        <path stroke="white" d="M 10 50 L 90 50" marker-end="url(#arrowhead)"/>
+                        <use x="100" width="100" height="100" fill="white" xlink:href="#svg_empty_document" />
+                        <text x="122" y="17" font-size="10" fill="white" font-weight="bold">cpn:</text>
+                        <use x="125" y="25" width="50" height="50" fill="var(--blue-color)" xlink:href="#svg_document" />
+                    </g>
+                    <g transform="translate(500 110)">
+                        <path stroke="white" d="M 10 50 L 90 50" marker-end="url(#arrowhead)"/>
+                        <use x="100" width="100" height="100" fill="white" xlink:href="#svg_empty_document" />
+                        <text x="122" y="17" font-size="10" fill="white" font-weight="bold">cpn:</text>
+                        <use x="125" y="25" width="50" height="50" fill="var(--red-color)" xlink:href="#svg_document" />
+                    </g>
+                    <g transform="translate(500 220)">
+                        <path stroke="white" d="M 10 50 L 90 50" marker-end="url(#arrowhead)"/>
+                        <use x="100" width="100" height="100" fill="white" xlink:href="#svg_empty_document" />
+                        <text x="122" y="17" font-size="10" fill="white" font-weight="bold">cpn:</text>
+                        <use x="125" y="25" width="50" height="50" fill="var(--cyan-color)" xlink:href="#svg_document" />
                     </g>
                 </symbol>
             </defs>

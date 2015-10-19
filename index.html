@@ -309,7 +309,7 @@ function(month, values) {
                 </section>
 
                 <section>
-                    <h2>Evolutions ?</h2>
+                    <h2>Evolutions ? TODO</h2>
                     <p>HDFS / MapR?</p>
                     <p>Spark ?</p>
                 </section>
@@ -334,7 +334,7 @@ function(month, values) {
                 <section>
                     <h2>How to write a query using Aggregation Framework ?</h2>
                     <p>Think of it as a pipeline, a series of processes your data will go through, one by one</p>
-                    <p>Several operations for a pipeline ...</p>
+                    <p>Several operations for a pipeline ... TODO</p>
                 </section>
 
                 <section>
@@ -365,6 +365,13 @@ function(month, values) {
                     <h2>$unwind</h2>
                     <svg height="320">
                         <use xlink:href="#svg_af_unwind" />
+                    </svg>
+                </section>
+
+                <section>
+                    <h2>SQL to Aggregation Framework</h2>
+                    <svg height="400">
+                        <use xlink:href="#svg_sql_to_agg_framework" />
                     </svg>
                 </section>
 
@@ -913,21 +920,95 @@ function(month, values) {
                     </g>
                     <g transform="translate(500 0)">
                         <path stroke="white" d="M 10 50 L 90 50" marker-end="url(#arrowhead)"/>
-                        <use x="100" width="100" height="100" fill="white" xlink:href="#svg_empty_document" />
+                        <use x="100" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_empty_document" />
                         <text x="122" y="17" font-size="10" fill="white" font-weight="bold">cpn:</text>
                         <use x="125" y="25" width="50" height="50" fill="var(--blue-color)" xlink:href="#svg_document" />
                     </g>
                     <g transform="translate(500 110)">
                         <path stroke="white" d="M 10 50 L 90 50" marker-end="url(#arrowhead)"/>
-                        <use x="100" width="100" height="100" fill="white" xlink:href="#svg_empty_document" />
+                        <use x="100" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_empty_document" />
                         <text x="122" y="17" font-size="10" fill="white" font-weight="bold">cpn:</text>
                         <use x="125" y="25" width="50" height="50" fill="var(--red-color)" xlink:href="#svg_document" />
                     </g>
                     <g transform="translate(500 220)">
                         <path stroke="white" d="M 10 50 L 90 50" marker-end="url(#arrowhead)"/>
-                        <use x="100" width="100" height="100" fill="white" xlink:href="#svg_empty_document" />
+                        <use x="100" width="100" height="100" fill="var(--yellow-color)" xlink:href="#svg_empty_document" />
                         <text x="122" y="17" font-size="10" fill="white" font-weight="bold">cpn:</text>
                         <use x="125" y="25" width="50" height="50" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                    </g>
+                </symbol>
+
+                <symbol id="svg_sql_to_agg_framework" viewBox="0 0 1000 450">
+                    <g>
+                        <rect y="5" width="350" height="80" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="85" width="350" height="20" style="fill: var(--red-color);stroke: var(--red-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="105" width="350" height="20" style="fill: var(--green-color);stroke: var(--green-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="125" width="350" height="20" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="145" width="350" height="40" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="185" width="350" height="20" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="205" width="350" height="20" style="fill: var(--yellow-color);stroke: var(--yellow-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="225" width="350" height="20" style="fill: var(--cyan-color);stroke: var(--cyan-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+
+                        <text font-family="consolas" font-size="18" fill="white" font-weight="bold">
+                            <tspan x="0" y="20">SELECT</tspan>
+                            <tspan x="20" y="40">fra_id, env_nb, env_ver, cpn.id,</tspan>
+                            <tspan x="20" y="60">sum(cpn.tax) AS tax,</tspan>
+                            <tspan x="20" y="80">sum(cpn.fee) AS fee</tspan>
+                            <tspan x="0" y="100">FROM documents</tspan>
+                            <tspan x="0" y="120">JOIN coupons ON doc_id</tspan>
+                            <tspan x="0" y="140">WHERE iss_date > '12-JAN-15'</tspan>
+                            <tspan x="0" y="160">GROUP BY</tspan>
+                            <tspan x="20" y="180">fra_id, env_nb, env_ver, cpn.id</tspan>
+                            <tspan x="0" y="200">HAVING tax > 0 OR fee > 0</tspan>
+                            <tspan x="0" y="220">ORDER BY fra_id DESC</tspan>
+                            <tspan x="0" y="240">LIMIT 4, 8;</tspan>
+                        </text>
+                    <g>
+
+                    <g transform="translate(650 0)">
+                        <rect y="5" width="350" height="20" style="fill: var(--red-color);stroke: var(--red-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="25" width="350" height="60" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="85" width="350" height="20" style="fill: var(--green-color);stroke: var(--green-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="105" width="350" height="200" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="305" width="350" height="80" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="385" width="350" height="20" style="fill: var(--yellow-color);stroke: var(--yellow-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="405" width="350" height="40" style="fill: var(--cyan-color);stroke: var(--cyan-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+
+                        <text font-family="consolas" font-size="18" fill="white" font-weight="bold">
+                            <tspan x="0" y="20">db.documents.aggregate([</tspan>
+                                <tspan x="20" y="40">{ $match: { </tspan>
+                                    <tspan x="40" y="60">iss_date: { $gt: "2015-01-12" }</tspan>
+                                <tspan x="20" y="80">} },</tspan>
+                                <tspan x="20" y="100">{ $unwind: "$cpn" },</tspan>
+                                <tspan x="20" y="120">{ $group: { </tspan>
+                                    <tspan x="40" y="140">_id: { </tspan>
+                                        <tspan x="60" y="160">fra_id: 1,</tspan>
+                                        <tspan x="60" y="180">env_nb: 1,</tspan>
+                                        <tspan x="60" y="200">env_ver: 1,</tspan>
+                                        <tspan x="60" y="220">cpn.id: 1</tspan>
+                                    <tspan x="40" y="240">},</tspan>
+                                    <tspan x="40" y="260">tax: { $sum: "$cpn.tax" }</tspan>
+                                    <tspan x="40" y="280">fee: { $sum: "$cpn.fee" }</tspan>
+                                <tspan x="20" y="300">} },</tspan>
+                                <tspan x="20" y="320">{ $match: { $or: [ </tspan>
+                                    <tspan x="40" y="340">{ tax: { $gt: 0 } },</tspan>
+                                    <tspan x="40" y="360">{ fee: { $gt: 0 } },</tspan>
+                                <tspan x="20" y="380">} },</tspan>
+                                <tspan x="20" y="400">{ $sort: { fra_id: -1 } },</tspan>
+                                <tspan x="20" y="420">{ $skip: 8 },</tspan>
+                                <tspan x="20" y="440">{ $limit: 4 }])</tspan>
+                        </text>
+                    </g>
+
+                    <g>
+                        <path d="M 350  45 L 500  45 C 515  45, 515  45, 515  60 L 515 190 C 515 205, 515 205, 530 205 L 650 205" stroke="var(--orange-color)" stroke-width="2" fill="none" />
+                        <path d="M 350  95 L 530  95 C 545  95, 545  95, 545  70 L 545  30 C 545  15, 545  15, 560  15 L 650  15" stroke="var(--red-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 115 L 560 115 C 575 115, 575 115, 575 100 L 575 110 C 575  95, 575  95, 590  95 L 650  95" stroke="var(--green-color)" stroke-width="2" fill="none" stroke-dasharray="10,10"/>
+                        <path d="M 350 135 L 590 135 C 605 135, 605 135, 605 120 L 605  70 C 605  55, 605  55, 620  55 L 650  55" stroke="var(--blue-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 165 L 470 165 C 485 165, 485 165, 485 180 L 485 190 C 485 205, 485 205, 500 205 L 650 205" stroke="var(--orange-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 195 L 440 195 C 455 195, 455 195, 455 210 L 455 330 C 455 345, 455 345, 470 345 L 650 345" stroke="var(--blue-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 215 L 410 215 C 425 215, 425 215, 425 230 L 425 380 C 425 395, 425 395, 440 395 L 650 395" stroke="var(--yellow-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 235 L 380 235 C 395 235, 395 235, 395 250 L 395 410 C 395 425, 395 425, 410 425 L 650 425" stroke="var(--cyan-color)" stroke-width="2" fill="none" />
                     </g>
                 </symbol>
             </defs>

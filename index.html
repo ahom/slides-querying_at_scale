@@ -343,6 +343,7 @@ function(month, values) {
                     <svg height="320">
                         <use xlink:href="#svg_af_match" />
                     </svg>
+                    <p><a href="https://docs.mongodb.org/manual/reference/operator/query/">Operators reference</a></p>
                 </section>
 
                 <section>
@@ -351,6 +352,7 @@ function(month, values) {
                     <svg height="320">
                         <use xlink:href="#svg_af_project" />
                     </svg>
+                    <p><a href="https://docs.mongodb.org/manual/meta/aggregation-quick-reference/#aggregation-expressions">Operators reference</a></p>
                 </section>
 
                 <section>
@@ -359,6 +361,7 @@ function(month, values) {
                     <svg height="320">
                         <use xlink:href="#svg_af_group" />
                     </svg>
+                    <p><a href="https://docs.mongodb.org/manual/meta/aggregation-quick-reference/#accumulators">Operators reference</a></p>
                 </section>
 
                 <section>
@@ -369,6 +372,124 @@ function(month, values) {
                 </section>
 
                 <section>
+                    <h2>Ok let's write some queries!</h2>
+                    <h3>Issuance Date Range</h3>
+                    <pre><code data-trim>
+let query = [
+    {
+        "$match": {
+            "iss_date": {
+                "$gte": ISODate("2015-01-01T00:00:00.000Z"),
+                "$lt":  ISODate("2015-02-01T00:00:00.000Z")
+            }
+        }
+    }
+]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Ok let's write some queries!</h2>
+                    <h3>Compute New Field</h3>
+                    <pre><code data-trim>
+let query = [
+    {
+        "$project": {
+            "tax_and_fee": {
+                "$add": [
+                    "$tax", 
+                    "$fee"
+                ]    
+            }
+        }
+    }
+]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Ok let's write some queries!</h2>
+                    <h3>Query at coupon level</h3>
+                    <pre><code data-trim>
+let query = [
+    { "$unwind": "$cpn" },
+    {
+        "$match": {
+            "cpn.flight_date": {
+                "$gte": ISODate("2015-01-01T00:00:00.000Z")
+            }
+        }
+    }
+]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Ok let's write some queries!</h2>
+                    <h3>Sum of GB taxes per coupon</h3>
+                    <pre><code data-trim>
+let query = [
+    { "$unwind": "$cpn" },
+    { "$unwind": "$cpn.tax" },
+    {
+        "$match": {
+            "cpn.tax.code": "GB"
+        }
+    },
+    {
+        "$group": {
+            "_id": {
+                "fraid": 1,
+                "cpn.id": 1
+            },
+            "gb_tax_sum": { "$sum": "$cpn.tax.value" }
+        }
+    }
+]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Ok let's write some queries!</h2>
+                    <h3>All documents with one coupon from NCE to PAR</h3>
+                    <pre><code data-trim>
+let query = [
+    {
+        "$match": {
+            "cpn": {
+                "$elemMatch": {
+                    "from": "NCE",
+                    "to": "PAR"
+                }
+            }
+        }
+    }
+]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Ok let's write some queries!</h2>
+                    <h3>All documents with calculated != collected</h3>
+                    <pre><code data-trim>
+let query = [
+    {
+        "$project": {
+            "tax_diff": {
+                "$subtract": [ "$calculated", "$collected"]
+            }
+        }
+    },
+    {
+        "$match": {
+            "tax_diff": { "$neq": 0 }
+        }
+    }
+]
+                    </code></pre>
+                </section>
+
+                <section>
                     <h2>SQL to Aggregation Framework</h2>
                     <svg height="400">
                         <use xlink:href="#svg_sql_to_agg_framework" />
@@ -376,28 +497,219 @@ function(month, values) {
                 </section>
 
                 <section>
-                    <h2>Ok let's write some queries</h2>
-                    <p>...</p>
+                    <h2>Chaining unwinds</h2>
+                    <h3>Sum of tax and fee</h3>
+                    <pre><code data-trim>
+let query = [
+    { "$unwind": "$tax" },
+    { "$unwind": "$fee" },
+    {
+        "$group": {
+            "_id": null,
+            "tax_sum": { "$sum": "$tax" },
+            "tax_fee": { "$sum": "$fee" }
+        }
+    }
+]
+                    </code></pre>
+                    <h2 class="fragment" style="color: var(--red-color)">Wrong</h3>
                 </section>
 
                 <section>
-                    <h2>How do you do that ?</h2>
-                    <p>...</p>
+                    <h2>Chaining unwinds</h2>
+                    <pre><code data-trim>
+let query = [
+    { "$unwind": "$tax" },
+    { "$unwind": "$fee" }
+]
+                    </code></pre>
+                    <p>What happens here?</p>
+                    <pre class="fragment"><code data-trim>
+let document = {                let results = [
+    "tax": [                        { "tax": "TAX_1", "fee": "FEE_1" },
+        "TAX_1",                    { "tax": "TAX_1", "fee": "FEE_2" },
+        "TAX_2",                    { "tax": "TAX_2", "fee": "FEE_1" },
+        "TAX_3"           ==>       { "tax": "TAX_2", "fee": "FEE_2" },
+    ],                              { "tax": "TAX_3", "fee": "FEE_1" },
+    "fee": [                        { "tax": "TAX_3", "fee": "FEE_2" }
+        "FEE_1",                ]
+        "FEE_2"       
+    ]               
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Chaining unwinds</h2>
+                    <h3>How to do it then ?</h3>
+                    <ul>
+                        <li class="fragment"><strong>Don't</strong> do it</li>
+                        <li class="fragment">Try to <strong>workaround</strong> it</li>
+                        <li class="fragment"><strong>Really</strong>, I mean it</li>
+                    </ul>
+                    <p class="fragment">What we really want after the unwinds ?</p>
+                    <pre class="fragment"><code data-trim>
+let document = {                            let results = [
+    "tax": [                                    { "tax": "TAX_1" },
+        "TAX_1",                                { "tax": "TAX_2" },
+        "TAX_2",                                { "tax": "TAX_3" },
+        "TAX_3"           ==>                   { "fee": "FEE_1" },
+    ],                                          { "fee": "FEE_2" },
+    "fee": [                                ]
+        "FEE_1",            
+        "FEE_2"       
+    ]               
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Chaining unwinds</h2>
+                    <h3>How you can do it right now</h3>
+                    <a href="https://rndwww.nce.amadeus.net/confluence/display/DRQ/Outer+excluding+join+with+MongoDB+Aggregation+Framework">Explanation here</a>
+                    <pre class="fragment"><code data-trim>
+let outer_join = [
+    {
+        "$project": {
+            "outer_join__": {
+                "$setUnion": [
+                    {
+                        "$map": {
+                            "input": [{}],
+                            "as": "dummy_var__",
+                            "in": {
+                                "$map": {
+                                    "input": "$tax",
+                                    "as": "var__",
+                                    "in": {
+                                        "tax": "$$var__"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$map": {
+                            "input": [{}],
+                            "as": "dummy_var__",
+                            "in": {
+                                "$map": {
+                                    "input": "$fee",
+                                    "as": "var__",
+                                    "in": {
+                                        "fee": "$$var__"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ] 
+            }
+        }
+    },
+    { "$unwind": "$outer_join__" },
+    { "$unwind": "$outer_join__" },
+    {
+        "$project": {
+            "tax": "$outer_join__.tax",
+            "fee": "$outer_join__.fee",
+        }
+    }
+]
+                    </code></pre>
                 </section>
 
                 <section>
                     <h2>Food for thoughs</h2>
-                    <p>...</p>
+                    <h3>CSV with fra_id and cpn.id</h3>
+                    <p>Naive solution</p>
+                    <pre><code data-trim>
+let query = [
+    { "$unwind": "$cpn" },
+    { 
+        "$match": {
+            "$or": [
+                { "fra_id": "X1", "cpn.id": "Y1" },
+                { "fra_id": "X2", "cpn.id": "Y2" },
+                { "fra_id": "X3", "cpn.id": "Y3" },
+                { "fra_id": "..", "cpn.id": ".." },
+                { "fra_id": "XN", "cpn.id": "YN" }
+            ]
+        }
+    }
+]
+                    </code></pre>
                 </section>
 
                 <section>
-                    <h2>New operators to come !</h2>
-                    <p>...</p>
+                    <h2>Food for thoughs</h2>
+                    <h3>Naive solution is not so great</h3>
+                    <ul>
+                        <li class="fragment">Naive solution <strong>does not scale well</strong>: N*M boolean conditions
+                            <pre><code data-trim>
+for(doc in documents) { // M documents
+    for(line in csv) {  // N conditions
+        doc == line?
+    }
+}
+                            </code></pre>
+                        </li>
+
+                        <li class="fragment">So how would you improve that? What <strong>logical operations</strong> should be done?
+                            <pre class="fragment"><code data-trim>
+let value_set = { line for line in csv }; // N conditions
+for(doc in documents) {                   // M documents
+    doc in value_set?
+}
+                            </code></pre>
+                        </li>
+                    </ul>
                 </section>
 
                 <section>
-                    <h2>How does it split the query</h2>
-                    <p>...</p>
+                    <h2>Food for thoughs</h2>
+                    <h3>Implementation in Aggregation Framework</h3>
+                    <pre><code data-trim>
+let query = [
+    { "$unwind": "$cpn" },
+    { 
+        "$project": {
+            "cond": {
+                "$setIsSubset": [
+                    {
+                        "$map": {
+                            "input": [null],
+                            "as": "var__", 
+                            "in": { "1": "$fra_id", "2": "$cpn.id" }
+                        }
+                    }, 
+                    [
+                       { "1": "X1", "2": "Y1" },
+                       { "1": "X2", "2": "Y2" },
+                       { "1": "X3", "2": "Y3" },
+                       { "1": "..", "2": ".." },
+                       { "1": "XN", "2": "YN" }
+                    ]
+                ]
+            }
+        }
+    },
+    { "$match": { "cond": true } }
+]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>What's with all these issues?</h2>
+                    <ul>
+                        <li class="fragment"><strong>Good</strong> relationship with mongo</li>
+                        <li class="fragment">All <strong>new operators</strong> we asked are implemented in 3.2 (target end of 2015)</li>
+                        <li class="fragment">Yes, it makes a <strong>huge</strong> difference</li>
+                </section>
+
+                <section>
+                    <h2>Thank you!</h2>
+                    <h2>Questions?</h2>
                 </section>
             </div>
         </div>
@@ -832,7 +1144,7 @@ function(month, values) {
                 <symbol id="svg_af_match" viewBox="0 0 500 320">
                     <g transform="translate(200 0)">
                         <rect width="100" height="320" fill="var(--blue-color)" />
-                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$match</text>
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-family="consolas" font-weight="bold">$match</text>
                     </g>
                     <g>
                         <use width="100" height="100" fill="white" xlink:href="#svg_document" />
@@ -853,7 +1165,7 @@ function(month, values) {
                 <symbol id="svg_af_project" viewBox="0 0 500 320">
                     <g transform="translate(200 0)">
                         <rect width="100" height="320" fill="var(--violet-color)" />
-                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$project</text>
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-family="consolas" font-weight="bold">$project</text>
                     </g>
                     <g>
                         <use width="100" height="100" fill="white" xlink:href="#svg_document" />
@@ -878,7 +1190,7 @@ function(month, values) {
                 <symbol id="svg_af_group" viewBox="0 0 500 320">
                     <g transform="translate(200 0)">
                         <rect width="100" height="320" fill="var(--orange-color)" />
-                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$group</text>
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-family="consolas" font-weight="bold">$group</text>
                     </g>
                     <g>
                         <use width="100" height="100" fill="white" xlink:href="#svg_document" />
@@ -906,7 +1218,7 @@ function(month, values) {
                 <symbol id="svg_af_unwind" viewBox="0 0 700 320">
                     <g transform="translate(400 0)">
                         <rect width="100" height="320" fill="var(--green-color)" />
-                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-weight="bold">$unwind: cpn</text>
+                        <text transform="rotate(90)" x="10" y="-10" font-size="50" fill="white" font-family="consolas" font-weight="bold">$unwind:cpn</text>
                     </g>
                     <g>
                         <use width="300" height="300" fill="white" xlink:href="#svg_empty_document" />
@@ -938,41 +1250,43 @@ function(month, values) {
                     </g>
                 </symbol>
 
-                <symbol id="svg_sql_to_agg_framework" viewBox="0 0 1000 450">
+                <symbol id="svg_sql_to_agg_framework" viewBox="0 0 1000 490">
                     <g>
-                        <rect y="5" width="350" height="80" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="85" width="350" height="20" style="fill: var(--red-color);stroke: var(--red-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="105" width="350" height="20" style="fill: var(--green-color);stroke: var(--green-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="125" width="350" height="20" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="145" width="350" height="40" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="5" width="350" height="60" style="fill: var(--violet-color);stroke: var(--violet-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="65" width="350" height="40" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="105" width="350" height="20" style="fill: var(--red-color);stroke: var(--red-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="125" width="350" height="20" style="fill: var(--green-color);stroke: var(--green-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="145" width="350" height="20" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="165" width="350" height="20" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
                         <rect y="185" width="350" height="20" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
                         <rect y="205" width="350" height="20" style="fill: var(--yellow-color);stroke: var(--yellow-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
                         <rect y="225" width="350" height="20" style="fill: var(--cyan-color);stroke: var(--cyan-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
 
                         <text font-family="consolas" font-size="18" fill="white" font-weight="bold">
                             <tspan x="0" y="20">SELECT</tspan>
-                            <tspan x="20" y="40">fra_id, env_nb, env_ver, cpn.id,</tspan>
-                            <tspan x="20" y="60">sum(cpn.tax) AS tax,</tspan>
-                            <tspan x="20" y="80">sum(cpn.fee) AS fee</tspan>
-                            <tspan x="0" y="100">FROM documents</tspan>
-                            <tspan x="0" y="120">JOIN coupons ON doc_id</tspan>
-                            <tspan x="0" y="140">WHERE iss_date > '12-JAN-15'</tspan>
-                            <tspan x="0" y="160">GROUP BY</tspan>
-                            <tspan x="20" y="180">fra_id, env_nb, env_ver, cpn.id</tspan>
+                                <tspan x="20" y="40">CONCAT(fra_id, '_', env_nb, '_',</tspan>
+                                    <tspan x="40" y="60">env_ver, '/', cpn.id) AS uid</tspan>
+                                <tspan x="20" y="80">sum(cpn.tax) AS tax,</tspan>
+                                <tspan x="20" y="100">sum(cpn.fee) AS fee</tspan>
+                            <tspan x="0" y="120">FROM documents</tspan>
+                            <tspan x="0" y="140">JOIN coupons ON doc_id</tspan>
+                            <tspan x="0" y="160">WHERE iss_date > '12-JAN-15'</tspan>
+                            <tspan x="0" y="180">GROUP BY uid</tspan>
                             <tspan x="0" y="200">HAVING tax > 0 OR fee > 0</tspan>
-                            <tspan x="0" y="220">ORDER BY fra_id DESC</tspan>
+                            <tspan x="0" y="220">ORDER BY uid DESC</tspan>
                             <tspan x="0" y="240">LIMIT 4, 8;</tspan>
                         </text>
                     <g>
 
                     <g transform="translate(650 0)">
-                        <rect y="5" width="350" height="20" style="fill: var(--red-color);stroke: var(--red-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="25" width="350" height="60" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="85" width="350" height="20" style="fill: var(--green-color);stroke: var(--green-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="105" width="350" height="200" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="305" width="350" height="80" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="385" width="350" height="20" style="fill: var(--yellow-color);stroke: var(--yellow-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
-                        <rect y="405" width="350" height="40" style="fill: var(--cyan-color);stroke: var(--cyan-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="5" width="360" height="20" style="fill: var(--red-color);stroke: var(--red-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="25" width="360" height="60" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="85" width="360" height="20" style="fill: var(--green-color);stroke: var(--green-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="105" width="360" height="140" style="fill: var(--violet-color);stroke: var(--violet-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="245" width="360" height="100" style="fill: var(--orange-color);stroke: var(--orange-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="345" width="360" height="80" style="fill: var(--blue-color);stroke: var(--blue-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="425" width="360" height="20" style="fill: var(--yellow-color);stroke: var(--yellow-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
+                        <rect y="445" width="360" height="40" style="fill: var(--cyan-color);stroke: var(--cyan-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
 
                         <text font-family="consolas" font-size="18" fill="white" font-weight="bold">
                             <tspan x="0" y="20">db.documents.aggregate([</tspan>
@@ -980,35 +1294,38 @@ function(month, values) {
                                     <tspan x="40" y="60">iss_date: { $gt: "2015-01-12" }</tspan>
                                 <tspan x="20" y="80">} },</tspan>
                                 <tspan x="20" y="100">{ $unwind: "$cpn" },</tspan>
-                                <tspan x="20" y="120">{ $group: { </tspan>
-                                    <tspan x="40" y="140">_id: { </tspan>
-                                        <tspan x="60" y="160">fra_id: 1,</tspan>
-                                        <tspan x="60" y="180">env_nb: 1,</tspan>
-                                        <tspan x="60" y="200">env_ver: 1,</tspan>
-                                        <tspan x="60" y="220">cpn.id: 1</tspan>
-                                    <tspan x="40" y="240">},</tspan>
-                                    <tspan x="40" y="260">tax: { $sum: "$cpn.tax" }</tspan>
-                                    <tspan x="40" y="280">fee: { $sum: "$cpn.fee" }</tspan>
-                                <tspan x="20" y="300">} },</tspan>
-                                <tspan x="20" y="320">{ $match: { $or: [ </tspan>
-                                    <tspan x="40" y="340">{ tax: { $gt: 0 } },</tspan>
-                                    <tspan x="40" y="360">{ fee: { $gt: 0 } },</tspan>
-                                <tspan x="20" y="380">} },</tspan>
-                                <tspan x="20" y="400">{ $sort: { fra_id: -1 } },</tspan>
-                                <tspan x="20" y="420">{ $skip: 8 },</tspan>
-                                <tspan x="20" y="440">{ $limit: 4 }])</tspan>
+                                <tspan x="20" y="120">{ $project: {</tspan>
+                                    <tspan x="40" y="140">uid: { $concat: [ "$fra_id", "_", </tspan>
+                                    <tspan x="60" y="160">"$env_nb", "_", "$env_ver", </tspan>
+                                    <tspan x="60" y="180">"/", "$cpn.id"] },</tspan>
+                                    <tspan x="40" y="200">cpn.tax: 1,</tspan>
+                                    <tspan x="40" y="220">cpn.fee: 1</tspan>
+                                <tspan x="20" y="240">} },</tspan>
+                                <tspan x="20" y="260">{ $group: { </tspan>
+                                    <tspan x="40" y="280">_id: "$uid", </tspan>
+                                    <tspan x="40" y="300">tax: { $sum: "$cpn.tax" }</tspan>
+                                    <tspan x="40" y="320">fee: { $sum: "$cpn.fee" }</tspan>
+                                <tspan x="20" y="340">} },</tspan>
+                                <tspan x="20" y="360">{ $match: { $or: [ </tspan>
+                                    <tspan x="40" y="380">{ tax: { $gt: 0 } },</tspan>
+                                    <tspan x="40" y="400">{ fee: { $gt: 0 } },</tspan>
+                                <tspan x="20" y="420">} },</tspan>
+                                <tspan x="20" y="440">{ $sort: { fra_id: -1 } },</tspan>
+                                <tspan x="20" y="460">{ $skip: 8 },</tspan>
+                                <tspan x="20" y="480">{ $limit: 4 }])</tspan>
                         </text>
                     </g>
 
                     <g>
-                        <path d="M 350  45 L 500  45 C 515  45, 515  45, 515  60 L 515 190 C 515 205, 515 205, 530 205 L 650 205" stroke="var(--orange-color)" stroke-width="2" fill="none" />
-                        <path d="M 350  95 L 530  95 C 545  95, 545  95, 545  70 L 545  30 C 545  15, 545  15, 560  15 L 650  15" stroke="var(--red-color)" stroke-width="2" fill="none" />
-                        <path d="M 350 115 L 560 115 C 575 115, 575 115, 575 100 L 575 110 C 575  95, 575  95, 590  95 L 650  95" stroke="var(--green-color)" stroke-width="2" fill="none" stroke-dasharray="10,10"/>
-                        <path d="M 350 135 L 590 135 C 605 135, 605 135, 605 120 L 605  70 C 605  55, 605  55, 620  55 L 650  55" stroke="var(--blue-color)" stroke-width="2" fill="none" />
-                        <path d="M 350 165 L 470 165 C 485 165, 485 165, 485 180 L 485 190 C 485 205, 485 205, 500 205 L 650 205" stroke="var(--orange-color)" stroke-width="2" fill="none" />
-                        <path d="M 350 195 L 440 195 C 455 195, 455 195, 455 210 L 455 330 C 455 345, 455 345, 470 345 L 650 345" stroke="var(--blue-color)" stroke-width="2" fill="none" />
-                        <path d="M 350 215 L 410 215 C 425 215, 425 215, 425 230 L 425 380 C 425 395, 425 395, 440 395 L 650 395" stroke="var(--yellow-color)" stroke-width="2" fill="none" />
-                        <path d="M 350 235 L 380 235 C 395 235, 395 235, 395 250 L 395 410 C 395 425, 395 425, 410 425 L 650 425" stroke="var(--cyan-color)" stroke-width="2" fill="none" />
+                        <path d="M 350  35 L 500  35 C 515  35, 515  35, 515  50 L 515 160 C 515 175, 515 175, 530 175 L 650 175" stroke="var(--violet-color)" stroke-width="2" fill="none" />
+                        <path d="M 350  85 L 470  85 C 485  85, 485  85, 485 100 L 485 280 C 485 295, 485 295, 500 295 L 650 295" stroke="var(--orange-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 115 L 530 115 C 545 115, 545 115, 545 100 L 545  30 C 545  15, 545  15, 560  15 L 650  15" stroke="var(--red-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 135 L 560 135 C 575 135, 575 135, 575 120 L 575 110 C 575  95, 575  95, 590  95 L 650  95" stroke="var(--green-color)" stroke-width="2" fill="none" stroke-dasharray="10,10"/>
+                        <path d="M 350 155 L 590 155 C 605 155, 605 155, 605 130 L 605  70 C 605  55, 605  55, 620  55 L 650  55" stroke="var(--blue-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 175 L 470 175 C 485 175, 485 175, 485 190 L 485 280 C 485 295, 485 295, 500 295 L 650 295" stroke="var(--orange-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 195 L 440 195 C 455 195, 455 195, 455 210 L 455 370 C 455 385, 455 385, 470 385 L 650 385" stroke="var(--blue-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 215 L 410 215 C 425 215, 425 215, 425 230 L 425 420 C 425 435, 425 435, 440 435 L 650 435" stroke="var(--yellow-color)" stroke-width="2" fill="none" />
+                        <path d="M 350 235 L 380 235 C 395 235, 395 235, 395 250 L 395 450 C 395 465, 395 465, 410 465 L 650 465" stroke="var(--cyan-color)" stroke-width="2" fill="none" />
                     </g>
                 </symbol>
             </defs>

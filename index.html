@@ -309,9 +309,9 @@ function(month, values) {
                 </section>
 
                 <section>
-                    <h2>Evolutions ? TODO</h2>
-                    <p>HDFS / MapR?</p>
-                    <p>Spark ?</p>
+                    <h2>Evolutions</h2>
+                    <p>HDFS / MapR</p>
+                    <p>Spark / Impala</p>
                 </section>
 
                 <section>
@@ -320,6 +320,31 @@ function(month, values) {
                         <li>You can do plain MapReduce</li>
                         <li>But you can also use the Aggregation Framework</li>
                     </ul>
+                </section>
+
+                <section>
+                    <h2>JSON documents</h2>
+                    <pre><code data-trim contenteditable>
+{
+    author: "ahom",
+    age: 30,
+    birth_date: "21/12/1984T03:45:23Z +953",
+    pet: null,
+    developer: true,
+
+    address: {
+        city: "Nice",
+        country: "France",
+    }
+
+    hobbies: [
+        "reverse engineering",
+        "cycling",
+        "drums",
+        ...
+    ]
+}
+                    </code></pre>
                 </section>
 
                 <section>
@@ -517,26 +542,9 @@ let query = [
 
                 <section>
                     <h2>Chaining unwinds</h2>
-                    <pre><code data-trim>
-let query = [
-    { "$unwind": "$tax" },
-    { "$unwind": "$fee" }
-]
-                    </code></pre>
-                    <p>What happens here?</p>
-                    <pre class="fragment"><code data-trim>
-let document = {                let results = [
-    "tax": [                        { "tax": "TAX_1", "fee": "FEE_1" },
-        "TAX_1",                    { "tax": "TAX_1", "fee": "FEE_2" },
-        "TAX_2",                    { "tax": "TAX_2", "fee": "FEE_1" },
-        "TAX_3"           ==>       { "tax": "TAX_2", "fee": "FEE_2" },
-    ],                              { "tax": "TAX_3", "fee": "FEE_1" },
-    "fee": [                        { "tax": "TAX_3", "fee": "FEE_2" }
-        "FEE_1",                ]
-        "FEE_2"       
-    ]               
-}
-                    </code></pre>
+                    <svg height="600">
+                        <use xlink:href="#svg_chain_unwind" />
+                    </svg>
                 </section>
 
                 <section>
@@ -548,19 +556,9 @@ let document = {                let results = [
                         <li class="fragment"><strong>Really</strong>, I mean it</li>
                     </ul>
                     <p class="fragment">What we really want after the unwinds ?</p>
-                    <pre class="fragment"><code data-trim>
-let document = {                            let results = [
-    "tax": [                                    { "tax": "TAX_1" },
-        "TAX_1",                                { "tax": "TAX_2" },
-        "TAX_2",                                { "tax": "TAX_3" },
-        "TAX_3"           ==>                   { "fee": "FEE_1" },
-    ],                                          { "fee": "FEE_2" },
-    "fee": [                                ]
-        "FEE_1",            
-        "FEE_2"       
-    ]               
-}
-                    </code></pre>
+                    <svg class="fragment" height="300">
+                        <use xlink:href="#svg_chain_unwind_wish" />
+                    </svg>
                 </section>
 
                 <section>
@@ -664,6 +662,14 @@ for(doc in documents) {                   // M documents
                             </code></pre>
                         </li>
                     </ul>
+                </section>
+
+                <section>
+                    <h2>Food for thoughs</h2>
+                    <h3>Hash Join vs Nested Loops Join</h3>
+                    <svg height="500">
+                        <use xlink:href="#svg_hash_vs_nested" />
+                    </svg>
                 </section>
 
                 <section>
@@ -1250,6 +1256,376 @@ let query = [
                     </g>
                 </symbol>
 
+                <symbol id="svg_chain_unwind" viewBox="0 0 1000 600">
+                    <path stroke="white" stroke-dasharray="10,10" d="M 0 290 L 1000 290" />
+                    <g transform="translate(0 80)">
+                        <rect width="250" height="140" style="fill: none;stroke: white; stroke-width:1;" />
+                        <g transform="translate(20 0)">
+                            <g transform="translate(0 20)">
+                                <g transform="translate(0 30)">
+                                    <text font-size="30" fill="white" font-weight="bold">
+                                        <tspan x="0" y="0">tax: [</tspan>
+                                        <tspan x="205" y="0">]</tspan>
+                                    </text>
+                                </g>
+                                <g transform="translate(65 0)">
+                                    <use width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                    <use x="50" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                    <use x="100" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                            <g transform="translate(0 80)">
+                                <g transform="translate(0 30)">
+                                    <text font-size="30" fill="white" font-weight="bold">
+                                        <tspan x="0" y="0">fee: [</tspan>
+                                        <tspan x="155" y="0">]</tspan>
+                                    </text>
+                                </g>
+                                <g transform="translate(65 0)">
+                                    <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                    <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+
+                    <path stroke="white" d="M 260 150 L 420 150" marker-end="url(#arrowhead)"/>
+
+                    <g transform="translate(430 50)">
+                        <rect width="50" height="200" fill="var(--green-color)" />
+                        <text transform="rotate(90)" x="10" y="-10" font-size="30" fill="white" font-family="consolas" font-weight="bold">$unwind:tax</text>
+                    </g>
+
+                    <path stroke="white" d="M 490 140 L 680 55" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 490 150 L 680 150" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 490 160 L 680 245" marker-end="url(#arrowhead)"/>
+
+                    <g transform="translate(690 0)">
+                        <g transform="translate(0 15)">
+                            <rect width="310" height="80" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 20)">
+                                    <g transform="translate(0 30)">
+                                        <text font-size="30" fill="white" font-weight="bold">
+                                            <tspan x="0" y="0">tax: </tspan>
+                                            <tspan x="95" y="0">, fee: [</tspan>
+                                            <tspan x="265" y="0">]</tspan>
+                                        </text>
+                                    </g>
+                                    <use x="55" width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                    <g transform="translate(175 0)">
+                                        <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                        <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                        <g transform="translate(0 110)">
+                            <rect width="310" height="80" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 20)">
+                                    <g transform="translate(0 30)">
+                                        <text font-size="30" fill="white" font-weight="bold">
+                                            <tspan x="0" y="0">tax: </tspan>
+                                            <tspan x="95" y="0">, fee: [</tspan>
+                                            <tspan x="265" y="0">]</tspan>
+                                        </text>
+                                    </g>
+                                    <use x="55" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                    <g transform="translate(175 0)">
+                                        <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                        <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                        <g transform="translate(0 205)">
+                            <rect width="310" height="80" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 20)">
+                                    <g transform="translate(0 30)">
+                                        <text font-size="30" fill="white" font-weight="bold">
+                                            <tspan x="0" y="0">tax: </tspan>
+                                            <tspan x="95" y="0">, fee: [</tspan>
+                                            <tspan x="265" y="0">]</tspan>
+                                        </text>
+                                    </g>
+                                    <use x="55" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                    <g transform="translate(175 0)">
+                                        <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                        <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+
+                    <g transform="translate(0 300)">
+                        <g transform="translate(0 0)">
+                            <g transform="translate(0 15)">
+                                <rect width="310" height="80" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 20)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: [</tspan>
+                                                <tspan x="265" y="0">]</tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                        <g transform="translate(175 0)">
+                                            <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                            <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 110)">
+                                <rect width="310" height="80" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 20)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: [</tspan>
+                                                <tspan x="265" y="0">]</tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                        <g transform="translate(175 0)">
+                                            <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                            <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 205)">
+                                <rect width="310" height="80" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 20)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: [</tspan>
+                                                <tspan x="265" y="0">]</tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                        <g transform="translate(175 0)">
+                                            <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                            <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+
+                        <path stroke="white" d="M 320 55 L 420 55" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 320 150 L 420 150" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 320 245 L 420 245" marker-end="url(#arrowhead)"/>
+
+                        <g transform="translate(430 30)">
+                            <rect width="50" height="240" fill="var(--green-color)" />
+                            <text transform="rotate(90)" x="30" y="-10" font-size="30" fill="white" font-family="consolas" font-weight="bold">$unwind:fee</text>
+                        </g>
+
+                        <path stroke="white" d="M 490 50 L 680 25" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 490 60 L 680 75" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 490 145 L 680 125" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 490 155 L 680 175" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 490 240 L 680 225" marker-end="url(#arrowhead)"/>
+                        <path stroke="white" d="M 490 250 L 680 275" marker-end="url(#arrowhead)"/>
+
+                        <g transform="translate(690 0)">
+                            <g>
+                                <rect width="240" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 5)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: </tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                        <use x="160" width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 50)">
+                                <rect width="240" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 5)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: </tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                        <use x="160" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 100)">
+                                <rect width="240" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 5)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: </tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                        <use x="160" width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 150)">
+                                <rect width="240" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 5)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: </tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                        <use x="160" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 200)">
+                                <rect width="240" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 5)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: </tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                        <use x="160" width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                            <g transform="translate(0 250)">
+                                <rect width="240" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                                <g transform="translate(20 0)">
+                                    <g transform="translate(0 5)">
+                                        <g transform="translate(0 30)">
+                                            <text font-size="30" fill="white" font-weight="bold">
+                                                <tspan x="0" y="0">tax: </tspan>
+                                                <tspan x="95" y="0">, fee: </tspan>
+                                            </text>
+                                        </g>
+                                        <use x="55" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                        <use x="160" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </symbol>
+
+                <symbol id="svg_chain_unwind_wish" viewBox="0 0 1000 300">
+                    <g transform="translate(0 80)">
+                        <rect width="250" height="140" style="fill: none;stroke: white; stroke-width:1;" />
+                        <g transform="translate(20 0)">
+                            <g transform="translate(0 20)">
+                                <g transform="translate(0 30)">
+                                    <text font-size="30" fill="white" font-weight="bold">
+                                        <tspan x="0" y="0">tax: [</tspan>
+                                        <tspan x="205" y="0">]</tspan>
+                                    </text>
+                                </g>
+                                <g transform="translate(65 0)">
+                                    <use width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                    <use x="50" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                    <use x="100" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                            <g transform="translate(0 80)">
+                                <g transform="translate(0 30)">
+                                    <text font-size="30" fill="white" font-weight="bold">
+                                        <tspan x="0" y="0">fee: [</tspan>
+                                        <tspan x="155" y="0">]</tspan>
+                                    </text>
+                                </g>
+                                <g transform="translate(65 0)">
+                                    <use width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                    <use x="50" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+
+                    <path stroke="white" d="M 260 150 L 420 150" marker-end="url(#arrowhead)"/>
+
+                    <g transform="translate(430 50)">
+                        <rect width="50" height="200" fill="var(--green-color)" />
+                        <text transform="rotate(90)" x="70" y="-10" font-size="30" fill="white" font-family="consolas" font-weight="bold">???</text>
+                    </g>
+
+                    <path stroke="white" d="M 490 130 L 680 30" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 490 140 L 680 90" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 490 150 L 680 150" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 490 160 L 680 210" marker-end="url(#arrowhead)"/>
+                    <path stroke="white" d="M 490 170 L 680 270" marker-end="url(#arrowhead)"/>
+
+                    <g transform="translate(690 0)">
+                        <g transform="translate(0 5)">
+                            <rect width="130" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 5)">
+                                    <text y="30" font-size="30" fill="white" font-weight="bold">tax: </text>
+                                    <use x="55" width="40" height="40" fill="var(--blue-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                        <g transform="translate(0 65)">
+                            <rect width="130" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 5)">
+                                    <text y="30" font-size="30" fill="white" font-weight="bold">tax: </text>
+                                    <use x="55" width="40" height="40" fill="var(--red-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                        <g transform="translate(0 125)">
+                            <rect width="130" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 5)">
+                                    <text y="30" font-size="30" fill="white" font-weight="bold">tax: </text>
+                                    <use x="55" width="40" height="40" fill="var(--cyan-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                        <g transform="translate(0 185)">
+                            <rect width="130" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 5)">
+                                    <text y="30" font-size="30" fill="white" font-weight="bold">fee: </text>
+                                    <use x="55" width="40" height="40" fill="var(--magenta-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                        <g transform="translate(0 245)">
+                            <rect width="130" height="50" style="fill: none;stroke: white; stroke-width:1;" />
+                            <g transform="translate(20 0)">
+                                <g transform="translate(0 5)">
+                                    <text y="30" font-size="30" fill="white" font-weight="bold">fee: </text>
+                                    <use x="55" width="40" height="40" fill="var(--yellow-color)" xlink:href="#svg_document" />
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </symbol>
+
                 <symbol id="svg_sql_to_agg_framework" viewBox="0 0 1000 490">
                     <g>
                         <rect y="5" width="350" height="60" style="fill: var(--violet-color);stroke: var(--violet-color); stroke-width:1; fill-opacity:0.5; stroke-opacity:1" />
@@ -1327,6 +1703,30 @@ let query = [
                         <path d="M 350 215 L 410 215 C 425 215, 425 215, 425 230 L 425 420 C 425 435, 425 435, 440 435 L 650 435" stroke="var(--yellow-color)" stroke-width="2" fill="none" />
                         <path d="M 350 235 L 380 235 C 395 235, 395 235, 395 250 L 395 450 C 395 465, 395 465, 410 465 L 650 465" stroke="var(--cyan-color)" stroke-width="2" fill="none" />
                     </g>
+                </symbol>
+
+                <symbol id="svg_hash_vs_nested" viewBox="0 0 1000 500">
+                    <text y="100" font-size="30" fill="var(--blue-color)" font-weight="bold">time</text>
+                    <text y="450" x="600" font-size="30" fill="var(--violet-color)" font-weight="bold">number of docs to scan</text>
+                    <g transform="translate(100 100)">
+                        <path stroke="var(--blue-color)" d="M 0 300 L 0 0" marker-end="url(#arrowhead)"/>
+                        <path stroke="var(--violet-color)" d="M 0 300 L 800 300" marker-end="url(#arrowhead)"/>
+
+                        <path stroke="var(--yellow-color)" d="M 0 300 L 800 0"/>
+                        <text x="700" y="0" font-size="30" fill="var(--yellow-color)" font-weight="bold">Nested Loops</text>
+
+                        <path stroke="var(--green-color)" d="M 0 300 L 0 250" stroke-dasharray="10,10"/>
+                        <circle cx="0" cy="250" r="5" fill="var(--green-color)" />
+                        <path stroke="var(--green-color)" d="M 0 250 L 800 200"/>
+                        <text x="700" y="200" font-size="30" fill="var(--green-color)" font-weight="bold">Hash Join</text>
+
+                        <circle cx="160" cy="240" r="5" fill="var(--red-color)" />
+                    </g>
+                    <path stroke="var(--red-color)" d="M 260 0 L 260 500" stroke-dasharray="10,10"/>
+
+                    <path stroke="var(--green-color)" d="M 95 400 L 95 350" marker-end="url(#arrowhead)"/>
+                    <text y="350" x="0" font-size="20" fill="var(--green-color)" font-weight="bold">compute</text>
+                    <text y="380" x="0" font-size="20" fill="var(--green-color)" font-weight="bold">hash table</text>
                 </symbol>
             </defs>
         </svg>

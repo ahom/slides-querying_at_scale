@@ -61,8 +61,12 @@
 
             <!-- Any section element inside of this container is displayed as a slide -->
             <div class="slides">
-                <section>
+                <section data-background="https://media.giphy.com/media/LfbLBInuSRynK/giphy.gif">
                     <h1>Querying at Scale</h1>
+                    <br/><br/>
+                    <br/><br/>
+                    <br/><br/>
+                    <br/><br/>
                     <h3>MapReduce and MongoDB's Aggregation Framework</h3>
                     <p>
                         <small>Created by <a href="https://rndwww.nce.amadeus.net/confluence/display/~ahom">Antoine Hom</a> / <a href="https://rndwww.nce.amadeus.net/confluence/display/DRQ">R&amp;D-AIR-TDF-FRA-RAC-DRQ</a></small>
@@ -96,8 +100,11 @@
                                 <li>You intend to write some MapReduce someday</li>
                             </ul>
                         </li>
-                        <li class="fragment">As a <strong>developer</strong>, you <strong>should</strong>, do I really need to explain why?</li>
+                        <li class="fragment">As a <strong>developer</strong>, you <strong>should</strong> care.</li>
                     </ul>
+                </section>
+
+                <section data-background="https://media.giphy.com/media/L88xIMpo2Hm2A/giphy.gif">
                 </section>
 
                 <section>
@@ -141,12 +148,15 @@
                     </ul>
                 </section>
 
+                <section data-background="https://media.giphy.com/media/EtB1yylKGGAUg/giphy.gif">
+                </section>
+
                 <section>
                     <h2>What should you do?</h2>
 
                     <ul>
                         <li class="fragment">No, you <strong>can't resign</strong>...</li>
-                        <li class="fragment">You're smart so you leave one team working on <strong>production support</strong>!</li>
+                        <li class="fragment">You're smart so you keep one team working on <strong>production support</strong>!</li>
                         <li class="fragment">Ok, let's be serious.</li>
                     </ul>
                 </section>
@@ -359,7 +369,10 @@ function(month, values) {
                 <section>
                     <h2>How to write a query using Aggregation Framework ?</h2>
                     <p>Think of it as a pipeline, a series of processes your data will go through, one by one</p>
-                    <p>Several operations for a pipeline ... TODO</p>
+                    <p>Like unix pipes</p>
+                    <pre><code data-trim contenteditable>
+cat log_file | grep "ERROR" | sort -n 
+                    </code></pre>
                 </section>
 
                 <section>
@@ -555,7 +568,7 @@ let query = [
                         <li class="fragment">Try to <strong>workaround</strong> it</li>
                         <li class="fragment"><strong>Really</strong>, I mean it</li>
                     </ul>
-                    <p class="fragment">What we really want after the unwinds ?</p>
+                    <p class="fragment">What we really want to be able to do?</p>
                     <svg class="fragment" height="300">
                         <use xlink:href="#svg_chain_unwind_wish" />
                     </svg>
@@ -618,7 +631,7 @@ let outer_join = [
                 </section>
 
                 <section>
-                    <h2>Food for thoughs</h2>
+                    <h2>Food for thought</h2>
                     <h3>CSV with fra_id and cpn.id</h3>
                     <p>Naive solution</p>
                     <pre><code data-trim>
@@ -640,10 +653,10 @@ let query = [
                 </section>
 
                 <section>
-                    <h2>Food for thoughs</h2>
+                    <h2>Food for thought</h2>
                     <h3>Naive solution is not so great</h3>
                     <ul>
-                        <li class="fragment">Naive solution <strong>does not scale well</strong>: N*M boolean conditions
+                        <li class="fragment">Naive solution <strong>does not scale well</strong>: O(NxM)
                             <pre><code data-trim>
 for(doc in documents) { // M documents
     for(line in csv) {  // N conditions
@@ -665,7 +678,7 @@ for(doc in documents) {                   // M documents
                 </section>
 
                 <section>
-                    <h2>Food for thoughs</h2>
+                    <h2>Food for thought</h2>
                     <h3>Hash Join vs Nested Loops Join</h3>
                     <svg height="500">
                         <use xlink:href="#svg_hash_vs_nested" />
@@ -673,7 +686,7 @@ for(doc in documents) {                   // M documents
                 </section>
 
                 <section>
-                    <h2>Food for thoughs</h2>
+                    <h2>Food for thought</h2>
                     <h3>Implementation in Aggregation Framework</h3>
                     <pre><code data-trim>
 let query = [
@@ -715,7 +728,9 @@ let query = [
 
                 <section>
                     <h2>Thank you!</h2>
-                    <h2>Questions?</h2>
+                </section>
+
+                <section data-background-size="800px" data-background="https://media.giphy.com/media/vYApfgSMN27CM/giphy.gif">
                 </section>
             </div>
         </div>
@@ -1640,8 +1655,8 @@ let query = [
 
                         <text font-family="consolas" font-size="18" fill="white" font-weight="bold">
                             <tspan x="0" y="20">SELECT</tspan>
-                                <tspan x="20" y="40">CONCAT(fra_id, '_', env_nb, '_',</tspan>
-                                    <tspan x="40" y="60">env_ver, '/', cpn.id) AS uid</tspan>
+                                <tspan x="20" y="40">CONCAT(fra_id, '_', ev_nb, '_',</tspan>
+                                    <tspan x="40" y="60">ev_ver, '/', cpn.id) AS uid</tspan>
                                 <tspan x="20" y="80">sum(cpn.tax) AS tax,</tspan>
                                 <tspan x="20" y="100">sum(cpn.fee) AS fee</tspan>
                             <tspan x="0" y="120">FROM documents</tspan>
@@ -1672,7 +1687,7 @@ let query = [
                                 <tspan x="20" y="100">{ $unwind: "$cpn" },</tspan>
                                 <tspan x="20" y="120">{ $project: {</tspan>
                                     <tspan x="40" y="140">uid: { $concat: [ "$fra_id", "_", </tspan>
-                                    <tspan x="60" y="160">"$env_nb", "_", "$env_ver", </tspan>
+                                    <tspan x="60" y="160">"$ev_nb", "_", "$ev_ver", </tspan>
                                     <tspan x="60" y="180">"/", "$cpn.id"] },</tspan>
                                     <tspan x="40" y="200">cpn.tax: 1,</tspan>
                                     <tspan x="40" y="220">cpn.fee: 1</tspan>
@@ -1685,10 +1700,10 @@ let query = [
                                 <tspan x="20" y="360">{ $match: { $or: [ </tspan>
                                     <tspan x="40" y="380">{ tax: { $gt: 0 } },</tspan>
                                     <tspan x="40" y="400">{ fee: { $gt: 0 } },</tspan>
-                                <tspan x="20" y="420">} },</tspan>
+                                <tspan x="20" y="420">] } },</tspan>
                                 <tspan x="20" y="440">{ $sort: { fra_id: -1 } },</tspan>
-                                <tspan x="20" y="460">{ $skip: 8 },</tspan>
-                                <tspan x="20" y="480">{ $limit: 4 }])</tspan>
+                                <tspan x="20" y="460">{ $skip: 4 },</tspan>
+                                <tspan x="20" y="480">{ $limit: 8 }])</tspan>
                         </text>
                     </g>
 
@@ -1712,21 +1727,23 @@ let query = [
                         <path stroke="var(--blue-color)" d="M 0 300 L 0 0" marker-end="url(#arrowhead)"/>
                         <path stroke="var(--violet-color)" d="M 0 300 L 800 300" marker-end="url(#arrowhead)"/>
 
-                        <path stroke="var(--yellow-color)" d="M 0 300 L 800 0"/>
-                        <text x="700" y="0" font-size="30" fill="var(--yellow-color)" font-weight="bold">Nested Loops</text>
+                        <path stroke="var(--yellow-color)" stroke-width="3" d="M 0 300 L 800 0"/>
+                        <text transform="rotate(-21)" x="560" y="280" font-size="30" fill="var(--yellow-color)" font-weight="bold">Nested Loops</text>
 
-                        <path stroke="var(--green-color)" d="M 0 300 L 0 250" stroke-dasharray="10,10"/>
+                        <path stroke="var(--green-color)" stroke-width="3" d="M 0 300 L 0 250" stroke-dasharray="10,10"/>
                         <circle cx="0" cy="250" r="5" fill="var(--green-color)" />
-                        <path stroke="var(--green-color)" d="M 0 250 L 800 200"/>
-                        <text x="700" y="200" font-size="30" fill="var(--green-color)" font-weight="bold">Hash Join</text>
+                        <path stroke="var(--green-color)" stroke-width="3" d="M 0 250 L 800 200"/>
+                        <text transform="rotate(-4)" x="650" y="250" font-size="30" fill="var(--green-color)" font-weight="bold">Hash Join</text>
 
                         <circle cx="160" cy="240" r="5" fill="var(--red-color)" />
                     </g>
                     <path stroke="var(--red-color)" d="M 260 0 L 260 500" stroke-dasharray="10,10"/>
-
-                    <path stroke="var(--green-color)" d="M 95 400 L 95 350" marker-end="url(#arrowhead)"/>
-                    <text y="350" x="0" font-size="20" fill="var(--green-color)" font-weight="bold">compute</text>
-                    <text y="380" x="0" font-size="20" fill="var(--green-color)" font-weight="bold">hash table</text>
+                    <text transform="rotate(90)" y="-92" x="350" font-size="30" fill="var(--orange-color)" font-weight="bold">
+                        <tspan y="-92" x="347">[</tspan>
+                        <tspan y="-92" x="396">]</tspan>
+                    </text>
+                    <text y="364" x="0" font-size="20" fill="var(--orange-color)" font-weight="bold">compute</text>
+                    <text y="394" x="0" font-size="20" fill="var(--orange-color)" font-weight="bold">hash table</text>
                 </symbol>
             </defs>
         </svg>

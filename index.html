@@ -71,10 +71,25 @@
                     <p>
                         <small>Created by <a href="https://rndwww.nce.amadeus.net/confluence/display/~ahom">Antoine Hom</a> / <a href="https://rndwww.nce.amadeus.net/confluence/display/DRQ">R&amp;D-AIR-TDF-FRA-RAC-DRQ</a></small>
                     </p>
+                    <aside class="notes" data-markdown>
+                        ```
+                        # Introduction
+                        
+                        Big word these days? Big Data
+                        What does it mean? Peta/Exa/Zetta/Yottabytes of data
+                        How do you query that? 
+                        How do you analyze/dig that much data?
+
+                        # Topics
+
+                        * What is MapReduce, how it works and what does it solve?
+                        * What is the Aggregation Framework and what does it bring to the table compared to MapReduce?
+                        ```
+                    </aside>
                 </section>
 
                 <section>
-                    <h2>What do I mean by Scale?</h2>
+                    <h2>How do we want to scale?</h2>
                     <div class="fragment">
                         Querying a database in a cluster (Most NoSQL databases)<br><br>
                         <svg height="150">
@@ -88,6 +103,14 @@
                             <use xlink:href="#svg_query_node" />
                         </svg>
                     </div>
+                    <aside class="notes" data-markdown>
+                        ```
+                        # Two ways to scale
+                        
+                        * horizontal
+                        * vertical
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -122,6 +145,12 @@
                         <br>???
                         <br>Concatenate the results at the end
                     </div>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * data partitioned equally on the nodes
+                        * what about group/sort queries?
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -130,6 +159,11 @@
                         <li class="fragment">The "Concatenation" step needs to <strong>understand</strong> how to do its job.</li>
                         <li class="fragment">This step is run on a single node, this is a <strong>choke point</strong></li>
                     </ul>
+                    <aside class="notes" data-markdown>
+                        ```
+                        The challenge is how do we actually merge the results
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -181,6 +215,13 @@
                     <svg height="400">
                         <use xlink:href="#svg_mapper_job" />
                     </svg>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * each mapper get a small box of tickets
+                        * for each ticket they write 0 to n lines
+                        * first column: partner airline / second column: balance
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -190,6 +231,12 @@
                     <svg height="400">
                         <use xlink:href="#svg_grouper_job" />
                     </svg>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * each grouper is associated with one airline
+                        * reads the output of the mappers
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -200,6 +247,12 @@
                     <svg height="400">
                         <use xlink:href="#svg_reducer_job" />
                     </svg>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * each reducer is associated with one airline
+                        * sum the list of numbers and write it behind the sheet
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -219,6 +272,15 @@
                     <svg height="500">
                         <use xlink:href="#svg_mapreduce" />
                     </svg>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * works on key, value
+                        * some parts are generic, handled by the system
+                        * the rest you need to write it!
+                        * don't you think there are cases where this won't perform so well?
+                        * what could be enhanced?
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -226,6 +288,14 @@
                     <svg height="500">
                         <use xlink:href="#svg_recursive_reduce" />
                     </svg>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * applying reduce several times recursively
+                        * it helps parrallelizing the reduce task
+                        * but it enforces an important property to the reduce function
+                        * it must be able to take inputs from the outputs of a reduce or a map
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -291,6 +361,12 @@ function(month, amounts) {
                         </tr>
                     </table>
                     <h2 class="fragment" style="color: var(--red-color)">Wrong</h3>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * What do you think is wrong?
+                        * Think about recursive reduce
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -316,12 +392,25 @@ function(month, values) {
     };
 }
                     </code></pre>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * One of the possible implementation
+                        * Doesn't lose information in the reduce phase
+                        * Some framework allow finalize function
+                        * Runs at the very end for each reduced key
+                        ```
+                    </aside>
                 </section>
 
                 <section>
                     <h2>Evolutions</h2>
                     <p>HDFS / MapR</p>
-                    <p>Spark / Impala</p>
+                    <p>Spark / Impala / Flink</p>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * For the curious ones
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -330,6 +419,13 @@ function(month, values) {
                         <li>You can do plain MapReduce</li>
                         <li>But you can also use the Aggregation Framework</li>
                     </ul>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * NoSQL database, document store
+                        * Used in Query Tool and Watson
+                        * Maybe (hopefully) in some time for RA events
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -355,10 +451,21 @@ function(month, values) {
     ]
 }
                     </code></pre>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * What does MongoDB stores?
+                        * Not tables à la Excel/SQL
+                        * JSON documents, schemaless
+                        * What are the advantages compared to SQL?
+                        * Arrays, that's the big thing about document stores
+                        * For MongoDB, obviously there is also the clustering
+                        * Complicated data structure, understood by the database
+                        ```
+                    </aside>
                 </section>
 
                 <section>
-                    <h2>What is the aggregation Framework ?</h2>
+                    <h2>What is the Aggregation Framework ?</h2>
                     <ul>
                         <li>Simplified MapReduce</li>
                         <li>Written in C++ for speed</li>
@@ -373,6 +480,14 @@ function(month, values) {
                     <pre><code data-trim contenteditable>
 cat log_file | grep "ERROR" | sort -n 
                     </code></pre>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * You write a chain of operations
+                        * Each operation reads from the output of its predecessor
+                        * A pipeline really....
+                        * One document at a time
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -628,6 +743,12 @@ let outer_join = [
     }
 ]
                     </code></pre>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * What is still wrong with that?
+                        * Fortunately MongoDB 3.2 will fix that
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -675,6 +796,17 @@ for(doc in documents) {                   // M documents
                             </code></pre>
                         </li>
                     </ul>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * Use a hash table!
+                        * What is a hash table? Expensive to build, cheap to search in (constant time)
+                        * Does that problem ring a bell to anybody?
+                        * Think SQL database?
+                        * Joins?
+                        * No really?
+                        * Nested Loops vs Hash (vs Merge) Joins
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -683,6 +815,15 @@ for(doc in documents) {                   // M documents
                     <svg height="500">
                         <use xlink:href="#svg_hash_vs_nested" />
                     </svg>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * Oracle 12c, adaptive plans
+                        * What's to remember?
+                        * Most problems are just smaller ones that are already solved
+                        * Make sure you know your datastructures/algorithms and you've done 99% of your job
+                        * And you've done it well
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -716,6 +857,14 @@ let query = [
     { "$match": { "cond": true } }
 ]
                     </code></pre>
+                    <aside class="notes" data-markdown>
+                        ```
+                        * All these problems are easy to solve logically
+                        * The sad part is the implementation
+                        * Need to find convoluted way to solve them
+                        * Even MongoDB guys were surprised
+                        ```
+                    </aside>
                 </section>
 
                 <section>
@@ -724,6 +873,7 @@ let query = [
                         <li class="fragment"><strong>Good</strong> relationship with mongo</li>
                         <li class="fragment">All <strong>new operators</strong> we asked are implemented in 3.2 (target end of 2015)</li>
                         <li class="fragment">Yes, it makes a <strong>huge</strong> difference</li>
+                    </ul>
                 </section>
 
                 <section>
